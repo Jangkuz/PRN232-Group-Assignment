@@ -28,7 +28,7 @@ internal class CreateGameCommandHandler(IDocumentSession session) : ICommandHand
     {
         //create Game entity from command object
         //save to database
-        //return CreateGameResult result               
+        //return CreateGameResult result
 
         var game = new Game
         {

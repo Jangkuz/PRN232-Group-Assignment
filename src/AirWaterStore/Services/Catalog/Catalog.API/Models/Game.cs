@@ -21,5 +21,4 @@ public class Game
     public decimal Price { get; set; }
 
     public int Quantity { get; set; }
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
