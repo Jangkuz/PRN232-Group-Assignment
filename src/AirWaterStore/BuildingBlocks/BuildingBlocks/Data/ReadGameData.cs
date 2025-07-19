@@ -1,33 +1,41 @@
-﻿
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Catalog.API.Data;
+namespace BuildingBlocks.Data;
 
-internal static class ReadGameData
+public static class ReadGameData
 {
-    public static Game ConvertToGame(GameJsonDto dto)
+    private static List<GameJsonDto> gameJsons = default!;
+    public static async Task<List<GameJsonDto>> ReadMockDataAsync()
     {
-        //IMPORTANT: this exist because the current mock data file is a string<Python List> so it needed to be process.
-        List<string> genreList = ParseTags(dto.Tags);
 
-        return new Game
+        if (gameJsons != null)
         {
-            Id = dto.AppId,
-            Title = dto.Title,
-            ThumbnailUrl = dto.ThumbnailUrl,
-            Description = dto.Description,
-            Genre = genreList ?? new List<string>(),
-            Developer = dto.Developer,
-            Publisher = dto.Publisher,
-            ReleaseDate = ParseDateOnly(dto.ReleaseDate),
-            Price = ParsePrice(dto.Price),
-            Quantity = Random.Shared.Next(5, 50) // mock quantity
-        };
+            return gameJsons;
+        }
+
+        List<GameJsonDto>? rawList = null;
+
+        try
+        {
+            var dir = Path.GetDirectoryName(typeof(ReadGameData).Assembly.Location)!;
+            var path = Path.Combine(dir, "Data", "steam_games.json");
+            var json = await File.ReadAllTextAsync(path);
+
+            rawList = JsonSerializer.Deserialize<List<GameJsonDto>>(json);
+
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        gameJsons = rawList?.ToList() ?? new();
+        return gameJsons;
     }
 
-    private static List<string> ParseTags(string tagString)
+    public static List<string> ParseTags(string tagString)
     {
         if (string.IsNullOrWhiteSpace(tagString)) return new();
 
@@ -39,7 +47,7 @@ internal static class ReadGameData
             .ToList();
     }
 
-    private static DateOnly? ParseDateOnly(string? dateStr)
+    public static DateOnly? ParseDateOnly(string? dateStr)
     {
         if (string.IsNullOrWhiteSpace(dateStr)) return null;
 
@@ -49,15 +57,15 @@ internal static class ReadGameData
         return null;
     }
 
-    private static decimal ParsePrice(string price)
+    public static decimal ParsePrice(string price)
     {
-        var cleaned = new string(price.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
-        cleaned = cleaned.Replace(",", "."); // ensure dot-decimal format
+        var cleaned = new string(price.Where(c => char.IsDigit(c)).ToArray());
+        //cleaned = cleaned.Replace(",", "."); // ensure dot-decimal format
 
         return decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture, out var val) ? val : 0;
     }
 }
-internal class GameJsonDto
+public class GameJsonDto
 {
     [JsonPropertyName("app_id")]
     public int AppId { get; set; }

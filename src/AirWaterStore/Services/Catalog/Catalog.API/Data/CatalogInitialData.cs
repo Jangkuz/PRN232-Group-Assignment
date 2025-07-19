@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using BuildingBlocks.Data;
+using System.Text.Json;
 
 namespace Catalog.API.Data;
 
@@ -21,21 +22,53 @@ public class CatalogInitialData : IInitialData
     }
 
     private static async Task<IEnumerable<Game>> GetPreconfigureGameAsync(){
-        var json = await File.ReadAllTextAsync("Data/steam_games.json");
-        var rawList = JsonSerializer.Deserialize<List<GameJsonDto>>(json);
 
-        return rawList?
-            .Select(ReadGameData.ConvertToGame)
-            .ToList() ?? new();
+        var rawList = await ReadGameData.ReadMockDataAsync();
+
+        return rawList
+            .Select(ConvertToGame)
+            .ToList();
     }
 
     private static async Task<IEnumerable<Review>> GetPreconfigureReviewAsync()
     {
-        var json = await File.ReadAllTextAsync("Data/steam_reviews.json");
-        var rawList = JsonSerializer.Deserialize<List<ReviewJsonDto>>(json);
+        var rawList = await ReadReviewData.ReadMockDataAsync();
 
-        return rawList?
-            .Select(ReadReviewData.ConvertToReview)
-            .ToList() ?? new();
+        return rawList
+            .Select(ConvertToReview)
+            .ToList();
+    }
+
+    private static Game ConvertToGame(GameJsonDto dto)
+    {
+        //IMPORTANT: this exist because the current mock data file is a string<Python List> so it needed to be process.
+        List<string> genreList = ReadGameData.ParseTags(dto.Tags);
+
+        return new Game
+        {
+            Id = dto.AppId,
+            Title = dto.Title,
+            ThumbnailUrl = dto.ThumbnailUrl,
+            Description = dto.Description,
+            Genre = genreList ?? new List<string>(),
+            Developer = dto.Developer,
+            Publisher = dto.Publisher,
+            ReleaseDate = ReadGameData.ParseDateOnly(dto.ReleaseDate),
+            Price = ReadGameData.ParsePrice(dto.Price),
+            Quantity = Random.Shared.Next(50, 500) // mock quantity
+        };
+    }
+
+    private static Review ConvertToReview(ReviewJsonDto dto)
+    {
+        return new Review
+        {
+            Id = dto.ReviewId,
+            UserId = dto.UserId,
+            GameId = dto.GameId,
+            Rating = dto.Rating,
+            Comment = dto.Comment,
+            ReviewDate = dto.ReviewDate
+        };
     }
 }

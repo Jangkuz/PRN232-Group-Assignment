@@ -1,6 +1,8 @@
 ﻿global using Mapster;
 global using Carter;
 global using Marten;
+global using Discount.gRPC.Protos;
+global using FluentValidation;
 global using Basket.API.Models;
 global using Basket.API.Data;
 global using BuildingBlocks.CQRS;
