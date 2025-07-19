@@ -7,9 +7,9 @@ public class OrderCreatedEventHandler
     IPublishEndpoint publishEndpoint,
     IFeatureManager featureManager,
     ILogger<OrderCreatedEventHandler> logger)
-    : INotificationHandler<OrderCreatedEvent>
+    : INotificationHandler<OrderUpdatedEvent>
 {
-    public async Task Handle(OrderCreatedEvent domainEvent, CancellationToken cancellationToken)
+    public async Task Handle(OrderUpdatedEvent domainEvent, CancellationToken cancellationToken)
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 

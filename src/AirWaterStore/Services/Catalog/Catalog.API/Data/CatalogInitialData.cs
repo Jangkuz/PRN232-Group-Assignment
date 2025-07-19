@@ -1,18 +1,34 @@
 ﻿using BuildingBlocks.Data;
+using BuildingBlocks.Messaging.Events;
+using MassTransit;
 using System.Text.Json;
 
 namespace Catalog.API.Data;
 
-public class CatalogInitialData : IInitialData
+public class CatalogInitialData  : IInitialData
 {
     public async Task Populate(IDocumentStore store, CancellationToken cancellation)
     {
         using var session = store.LightweightSession();
-        if (!await session.Query<Game>().AnyAsync())
-        {
-            session.Store<Game>(await GetPreconfigureGameAsync());
-            await session.SaveChangesAsync();
-        }
+        //if (!await session.Query<Game>().AnyAsync())
+        //{
+        //    var games = await GetPreconfigureGameAsync();
+
+        //    foreach (var game in games)
+        //    {
+        //    session.Store<Game>(await GetPreconfigureGameAsync());
+        //        var evenMessage = new GameCreatedEvent
+        //        {
+        //            GameId = game.Id,
+        //            Title = game.Title,
+        //            Price = game.Price
+        //        };
+
+        //        await publishEndpoint.Publish(evenMessage, cancellation);
+        //    }
+
+        //    await session.SaveChangesAsync();
+        //}
 
         if (!await session.Query<Review>().AnyAsync())
         {
@@ -21,7 +37,8 @@ public class CatalogInitialData : IInitialData
         }
     }
 
-    private static async Task<IEnumerable<Game>> GetPreconfigureGameAsync(){
+    public static async Task<IEnumerable<Game>> GetPreconfigureGameAsync()
+    {
 
         var rawList = await ReadGameData.ReadMockDataAsync();
 

@@ -10,9 +10,10 @@ public static class DatabaseExtentions
 
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        context.Database.MigrateAsync().GetAwaiter().GetResult();
+        await context.Database.MigrateAsync();
+        //context.Database.MigrateAsync().GetAwaiter().GetResult();
 
-        await SeedAsync(context);
+        //await SeedAsync(context);
     }
 
     private static async Task SeedAsync(ApplicationDbContext context)

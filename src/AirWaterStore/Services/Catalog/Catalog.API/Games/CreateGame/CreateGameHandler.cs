@@ -1,4 +1,7 @@
-﻿namespace Catalog.API.Games.CreateGame;
+﻿using BuildingBlocks.Messaging.Events;
+using MassTransit;
+
+namespace Catalog.API.Games.CreateGame;
 public record CreateGameCommand(
     string ThumbnailUrl,
     string Title,
@@ -22,7 +25,10 @@ public class CreateGameCommandValidator : AbstractValidator<CreateGameCommand>
     }
 }
 
-internal class CreateGameCommandHandler(IDocumentSession session) : ICommandHandler<CreateGameCommand, CreateGameResult>
+internal class CreateGameCommandHandler(
+    IDocumentSession session,
+    IPublishEndpoint publishEndpoint
+    ) : ICommandHandler<CreateGameCommand, CreateGameResult>
 {
     public async Task<CreateGameResult> Handle(CreateGameCommand command, CancellationToken cancellationToken)
     {
@@ -46,6 +52,15 @@ internal class CreateGameCommandHandler(IDocumentSession session) : ICommandHand
         //save to database
         session.Store(game);
         await session.SaveChangesAsync(cancellationToken);
+
+        var eventMessage = new GameCreatedEvent
+        {
+            GameId = game.Id,
+            Title = game.Title,
+            Price = game.Price
+        };
+
+        await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         //return result
         return new CreateGameResult(game.Id);

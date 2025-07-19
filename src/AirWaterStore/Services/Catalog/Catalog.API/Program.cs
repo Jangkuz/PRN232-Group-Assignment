@@ -1,6 +1,8 @@
 
 
 
+using BuildingBlocks.Messaging.MassTransit;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var assembly = typeof(Program).Assembly;
@@ -23,8 +25,11 @@ builder.Services.AddMarten(opt =>
 
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddHostedService<SeedAndPublishStartupService>();
     builder.Services.InitializeMartenWith<CatalogInitialData>();
 }
+
+builder.Services.AddMessageBroker(builder.Configuration);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
