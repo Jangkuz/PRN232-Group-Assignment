@@ -54,7 +54,7 @@ internal class InitialData
     {
         return Customer.Create(
             id: CustomerId.Of(dto.UserId),
-            name: dto.Username,
+            name: dto.UserName,
             email: dto.Email
             );
     }

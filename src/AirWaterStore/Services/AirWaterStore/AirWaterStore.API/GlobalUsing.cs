@@ -1,0 +1,10 @@
+﻿global using Carter;
+global using Mapster;
+global using MediatR;
+global using BuildingBlocks.CQRS;
+global using BuildingBlocks.Behaviors;
+global using BuildingBlocks.Exceptions;
+global using AirWaterStore.API.Data;
+global using AirWaterStore.API.Models;
+global using AirWaterStore.API.Helper;
+global using Microsoft.AspNetCore.Identity;

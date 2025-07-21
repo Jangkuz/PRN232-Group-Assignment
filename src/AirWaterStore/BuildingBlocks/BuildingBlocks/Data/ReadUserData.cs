@@ -37,7 +37,7 @@ public class UserJsonDto
     public int UserId { get; set; }
 
     [JsonPropertyName("username")]
-    public string Username { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
 
     [JsonPropertyName("email")]
     public string Email { get; set; } = string.Empty;

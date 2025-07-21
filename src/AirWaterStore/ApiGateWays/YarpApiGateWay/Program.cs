@@ -17,6 +17,25 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
     });
 });
 
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.Authority = "https://your-auth-server.com"; // your UserApi or IdentityServer
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateAudience = false,
+//            ValidIssuer = "your-issuer",
+//            ValidAudience = "your-audience",
+//            RoleClaimType = ClaimTypes.Role
+//        };
+//    });
+
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("AdminOnly", policy =>
+//        policy.RequireRole("Admin"));
+//});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
