@@ -5,6 +5,9 @@ services:
   basketdb:
     image: postgres
 
+  airwaterstoredb:
+    image: postgres
+
   distributedcache:
     image: redis
 
@@ -44,8 +47,16 @@ services:
       context: .
       dockerfile: ApiGateWays/YarpApiGateWay/Dockerfile
 
+  airwaterstore.api:
+    image: ${DOCKER_REGISTRY-}airwaterstoreapi
+    build:
+      context: .
+      dockerfile: Services/AirWaterStore/AirWaterStore.API/Dockerfile
+
 volumes:
   postgres_catalog:
   postgres_basket:
+  postgres_airwaterstore:
+
 
 

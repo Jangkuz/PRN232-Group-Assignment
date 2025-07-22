@@ -1,7 +1,4 @@
-﻿using AirWaterStore.API.Helper;
-using Microsoft.AspNetCore.Identity;
-
-namespace AirWaterStore.API.Users.CreateUser;
+﻿namespace AirWaterStore.API.Users.CreateUser;
 
 public record CreateUserCommand(
     string UserName,
@@ -13,7 +10,7 @@ public record CreateUserResult(int Id);
 
 //TODO: add validator
 
-public class CreateUserHandler(
+internal class CreateUserHandler(
     UserManager<User> userManager
     ) : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
@@ -36,6 +33,9 @@ public class CreateUserHandler(
         }
 
         await userManager.AddToRoleAsync(user, AppConst.User);
+
+        //TODO: publish UserCreated Intergration Event
+        //TODO: Return login token for auto login
 
         return new CreateUserResult(user.Id);
     }

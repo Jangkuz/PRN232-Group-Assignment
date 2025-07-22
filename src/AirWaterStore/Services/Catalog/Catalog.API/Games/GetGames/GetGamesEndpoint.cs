@@ -1,16 +1,15 @@
 ﻿
 namespace Catalog.API.Games.GetGames;
 
-public record GetGamesRequest(
-    int? PageNumber = 1, 
-    int? PageSize = 10);
+//public record GetGamesRequest(
+//    );
 public record GetGamesResponse(IEnumerable<Game> Games);
 
 public class GetGamesEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/games", async ([AsParameters] GetGamesRequest request, ISender sender) =>
+        app.MapGet("/games", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
             var query = request.Adapt<GetGamesQuery>();
 

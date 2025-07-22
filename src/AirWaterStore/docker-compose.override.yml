@@ -23,6 +23,18 @@ services:
     volumes:
       - postgres_basket:/var/lib/postgresql/data/ 
 
+  airwaterstoredb:
+    container_name: airwaterstoredb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=AirWaterStoreDb
+    restart: always
+    ports:
+        - "5434:5432"
+    volumes:
+      - postgres_airwaterstore:/var/lib/postgresql/data/ 
+
   distributedcache:
     container_name: distributedcache
     restart: always
@@ -136,6 +148,21 @@ services:
     ports:
       - "6004:8080"
       - "6064:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  airwaterstore.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__Database=Server=airwaterstoredb;Port=5432;Database=AirWaterStoreDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    depends_on:
+      - airwaterstoredb
+    ports:
+      - "6005:8080"
+      - "6065:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

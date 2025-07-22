@@ -12,7 +12,7 @@ public record LoginQuery(
 
 public record LoginResult(string Token);
 
-public class LoginHandler(
+internal class LoginHandler(
     UserManager<User> userManager,
     IConfiguration config
     ) : IQueryHandler<LoginQuery, LoginResult>
@@ -31,8 +31,9 @@ public class LoginHandler(
 
         var claims = new List<Claim>
         {
-            new Claim(AppConst.AccIdClaim, user.Id.ToString()),
-            new Claim (ClaimTypes.Email, user.Email ?? ""),
+            new Claim(AppConst.UserIdClaim, user.Id.ToString()),
+            new Claim(AppConst.RoleClaim, roles.ToString()!),
+            new Claim(AppConst.UserNameClaim, user.UserName!)
         };
 
         foreach (var role in roles)

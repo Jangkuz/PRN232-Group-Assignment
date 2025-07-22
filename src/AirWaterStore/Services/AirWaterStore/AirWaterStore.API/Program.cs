@@ -1,9 +1,7 @@
-using AirWaterStore.API.Helper;
+using AirWaterStore.API.Extentions;
 using BuildingBlocks.Exceptions.Handler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -36,7 +34,7 @@ builder.Services.AddIdentityCore<User>(options =>
     .AddSignInManager<SignInManager<User>>()
     .AddRoleManager<RoleManager<Role>>()
     .AddDefaultTokenProviders();
-builder.Services.AddDataProtection(); // Required for token provider
+//builder.Services.AddDataProtection(); // Required for token provider
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,6 +63,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    await app.InitialiseDatabaseAsync();
     using (var scope = app.Services.CreateScope())
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();

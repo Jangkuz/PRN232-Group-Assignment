@@ -24,14 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
-    <Folder Include="Users\UpdateUser\" />
-    <Folder Include="Users\GetUserTotalCount\" />
-    <Folder Include="Users\GetUserById\" />
-    <Folder Include="Users\GetUsers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
 

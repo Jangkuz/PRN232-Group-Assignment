@@ -1,0 +1,183 @@
+﻿@page
+@using AirWaterStore.Web.Helper
+@model AirWaterStore.Web.Pages.Chat.IndexModel
+@{
+    ViewData["Title"] = "Support Chat";
+}
+
+<h1>Support Chat</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Chat with Support</h5>
+            </div>
+            <div class="card-body" style="height: 400px; overflow-y: auto;" id="chatMessages">
+                @if (Model.Messages.Any())
+                {
+                    @foreach (var message in Model.Messages)
+                    {
+                        <div class="message-item mb-3 @(message.UserId == Model.GetCurrentUserId() ? "text-right" : "text-left")" data-message-id="@message.MessageId">
+                            <div class="d-inline-block p-2 rounded @(message.UserId == Model.GetCurrentUserId() ? "bg-primary text-white" : "bg-light")">
+                                <small class="d-block @(message.UserId == Model.GetCurrentUserId() ? "text-white-50" : "text-muted")">
+                                    @Model.GetUsername(message.UserId) - @message.SentAt?.ToString("HH:mm")
+                                </small>
+                                @message.Content
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center" id="noMessagesText">No messages yet. Start a conversation!</p>
+                }
+            </div>
+            <div class="card-footer">
+                <div id="typingIndicator" class="text-muted small mb-2" style="display: none;">
+                    <span id="typingText"></span> is typing...
+                </div>
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="form-control" placeholder="Type your message..." />
+                    <div class="input-group-append">
+                        <button type="button" id="sendButton" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Welcome to our support chat!</p>
+                <p>A staff member will respond to your messages as soon as possible.</p>
+                <p class="mb-0">
+                    <strong>Status:</strong>
+                    <span id="connectionStatus" class="text-warning">Connecting...</span>
+                </p>
+                <p class="mb-0">
+                    <strong>Chat Status:</strong>
+                    @if (Model.ChatRoom.StaffId.HasValue)
+                    {
+                        <span class="text-success">Connected with support</span>
+                    }
+                    else
+                    {
+                        <span class="text-warning">Waiting for staff...</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="chatRoomId" value="@Model.ChatRoom.ChatRoomId" />
+<input type="hidden" id="currentUserId" value="@Model.GetCurrentUserId()" />
+<input type="hidden" id="currentUsername" value="@Model.GetUsername(Model.GetCurrentUserId())" />
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+        const currentUserId = parseInt(document.getElementById('currentUserId').value);
+        const currentUsername = document.getElementById('currentUsername').value;
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const typingText = document.getElementById('typingText');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const noMessagesText = document.getElementById('noMessagesText');
+
+        let typingTimer;
+
+        // Receive message
+        connection.on("ReceiveMessage", function (message) {
+            if (noMessagesText) {
+                noMessagesText.style.display = 'none';
+            }
+
+            const messageDiv = document.createElement('div');
+            const isCurrentUser = message.userId === currentUserId;
+
+            messageDiv.className = `message-item mb-3 ${isCurrentUser ? 'text-right' : 'text-left'}`;
+            messageDiv.setAttribute('data-message-id', message.messageId);
+
+            messageDiv.innerHTML = `
+                <div class="d-inline-block p-2 rounded ${isCurrentUser ? 'bg-primary text-white' : 'bg-light'}">
+                    <small class="d-block ${isCurrentUser ? 'text-white-50' : 'text-muted'}">
+                        ${message.username} - ${message.sentAt}
+                    </small>
+                    ${message.content}
+                </div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        // Handle typing indicator
+        connection.on("UserTyping", function (data) {
+            if (data.userId !== currentUserId) {
+                if (data.isTyping) {
+                    typingText.textContent = data.username;
+                    typingIndicator.style.display = 'block';
+                } else {
+                    typingIndicator.style.display = 'none';
+                }
+            }
+        });
+
+        // Send message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                connection.invoke("SendMessage", chatRoomId, message).catch(function (err) {
+                    console.error(err);
+                });
+                messageInput.value = '';
+                connection.invoke("NotifyTyping", chatRoomId, false);
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            } else {
+                clearTimeout(typingTimer);
+                connection.invoke("NotifyTyping", chatRoomId, true);
+
+                typingTimer = setTimeout(function () {
+                    connection.invoke("NotifyTyping", chatRoomId, false);
+                }, 1000);
+            }
+        });
+
+        // Start connection
+        connection.start().then(function () {
+            connectionStatus.textContent = 'Connected';
+            connectionStatus.className = 'text-success';
+
+            // Join chat room
+            connection.invoke("JoinChatRoom", chatRoomId).catch(function (err) {
+                console.error(err);
+            });
+        }).catch(function (err) {
+            console.error(err);
+            connectionStatus.textContent = 'Connection failed';
+            connectionStatus.className = 'text-danger';
+        });
+
+        // Auto-scroll to bottom on load
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    </script>
+}

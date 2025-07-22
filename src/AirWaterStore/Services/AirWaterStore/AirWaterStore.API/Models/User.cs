@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace AirWaterStore.API.Models;
+﻿namespace AirWaterStore.API.Models;
 
 public class User : IdentityUser<int>
 {

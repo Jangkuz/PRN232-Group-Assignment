@@ -43,6 +43,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AirWaterStore", "AirWaterSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirWaterStore.API", "Services\AirWaterStore\AirWaterStore.API\AirWaterStore.API.csproj", "{3C34B4B4-1916-4E82-BDC3-C1A4EDF65245}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApps", "WebApps", "{CC74B464-5D0E-4070-89C6-10E17D2D8136}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirWaterStore.Web", "WebApps\AirWaterStore.Web\AirWaterStore.Web.csproj", "{957249FB-37D2-812D-C7F8-3017F5832C91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +101,10 @@ Global
 		{3C34B4B4-1916-4E82-BDC3-C1A4EDF65245}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C34B4B4-1916-4E82-BDC3-C1A4EDF65245}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C34B4B4-1916-4E82-BDC3-C1A4EDF65245}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957249FB-37D2-812D-C7F8-3017F5832C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957249FB-37D2-812D-C7F8-3017F5832C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957249FB-37D2-812D-C7F8-3017F5832C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957249FB-37D2-812D-C7F8-3017F5832C91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +126,7 @@ Global
 		{3099F812-6C78-4ED9-A53F-1A5D01E69FB8} = {2836467C-4FC1-4D6C-8B66-79789BF949FD}
 		{CCE2E542-DD01-4479-9FAA-E7E47253A741} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3C34B4B4-1916-4E82-BDC3-C1A4EDF65245} = {CCE2E542-DD01-4479-9FAA-E7E47253A741}
+		{957249FB-37D2-812D-C7F8-3017F5832C91} = {CC74B464-5D0E-4070-89C6-10E17D2D8136}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C11E276B-2224-4BC9-82D7-764EA47EF08E}
