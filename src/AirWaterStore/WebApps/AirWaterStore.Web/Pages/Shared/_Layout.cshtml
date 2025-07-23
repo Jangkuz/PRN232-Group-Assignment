@@ -8,8 +8,7 @@
     var isCustomer = userRole == 1;
 
     // Get cart count
-    var cartItems = Context.Session.GetObjectFromJson<List<AirWaterStore.Web.Pages.Games.CartItem>>("Cart") ?? new
-    List<AirWaterStore.Web.Pages.Games.CartItem>();
+    var cartItems = Context.Session.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();
     var cartCount = cartItems.Sum(c => c.Quantity);
 }
 <!DOCTYPE html>

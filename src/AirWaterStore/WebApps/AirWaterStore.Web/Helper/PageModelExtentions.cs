@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace AirWaterStore.Web.Helper;
 
 public static class PageModelExtentions
@@ -28,4 +26,5 @@ public static class PageModelExtentions
     {
         return page.HttpContext.Session.GetInt32(SessionParams.UserRole) == UserRole.Staff;
     }
+
 }

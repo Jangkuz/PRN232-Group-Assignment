@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace AirWaterStore.Web.Pages
+﻿namespace AirWaterStore.Web.Pages
 {
     public class PrivacyModel : PageModel
     {
