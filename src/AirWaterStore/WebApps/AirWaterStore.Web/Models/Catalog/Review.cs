@@ -1,4 +1,6 @@
-﻿namespace AirWaterStore.Web.Models;
+﻿using AirWaterStore.Web.Models.AirWaterStore;
+
+namespace AirWaterStore.Web.Models.Catalog;
 
 public partial class Review
 {

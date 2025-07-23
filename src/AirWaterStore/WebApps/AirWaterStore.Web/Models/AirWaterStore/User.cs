@@ -1,4 +1,7 @@
-﻿namespace AirWaterStore.Web.Models;
+﻿using AirWaterStore.Web.Models.Catalog;
+using AirWaterStore.Web.Models.Ordering;
+
+namespace AirWaterStore.Web.Models.AirWaterStore;
 
 public partial class User
 {

@@ -1,14 +1,14 @@
-﻿namespace AirWaterStore.Web.Pages.Games
+﻿
+using AirWaterStore.Web.Services;
+
+namespace AirWaterStore.Web.Pages.Games
 {
-    public class IndexModel : PageModel
+    public class IndexModel (
+        ICatalogService catalogService,
+        ILogger<IndexModel> logger
+        ) : PageModel
     {
         private const int PageSize = 9;
-        //private readonly IGameService _gameService;
-
-        //public IndexModel(IGameService gameService)
-        //{
-        //    _gameService = gameService;
-        //}
 
         public List<Game> Games { get; set; } = new List<Game>();
 
@@ -29,27 +29,29 @@
             //    SuccessMessage = successMessgae.ToString();
             //}
 
-            //var allGames = await _gameService.GetAllAsync(1, 1000); // Get all for filtering
+            var result = await catalogService.GetGames(1, 1000); // Get all for filtering
+
+            var allGames = result.Games;
 
             //// Filter by search string
-            //if (!string.IsNullOrEmpty(SearchString))
-            //{
-            //    allGames = allGames.Where(g =>
-            //        g.Title.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-            //        (g.Genre?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            //        (g.Developer?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false)
-            //    ).ToList();
-            //}
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                allGames = allGames.Where(g =>
+                    g.Title.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    (g.Genre.ToString()?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (g.Developer?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false)
+                ).ToList();
+            }
 
             //// Calculate pagination
-            //var totalCount = allGames.Count;
-            //TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+            var totalCount = allGames.Count();
+            TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
 
-            //// Get paginated results
-            //Games = allGames
-            //    .Skip((CurrentPage - 1) * PageSize)
-            //    .Take(PageSize)
-            //    .ToList();
+            // Get paginated results
+            Games = allGames
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
 
             return Page();
         }

@@ -16,10 +16,12 @@ internal class GetGamesHandler(IDocumentSession session)
 {
     public async Task<GetGamesResult> Handle(GetGamesQuery query, CancellationToken cancellationToken)
     {
+        //int pageIndex = (int)query.PageNumber!;
+        //int pageSize = (int)query.PageSize!;
+        int pageIndex = query.PaginationRequest.PageIndex;
+        int pageSize = query.PaginationRequest.PageSize;
         var games = await session.Query<Game>()
-           .ToPagedListAsync(query.PaginationRequest.PageIndex,
-           query.PaginationRequest.PageSize,
-           cancellationToken);
+           .ToPagedListAsync(pageIndex, pageSize);
 
         return new GetGamesResult(games);
     }

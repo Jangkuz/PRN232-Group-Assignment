@@ -1,4 +1,6 @@
-﻿namespace AirWaterStore.Web.Models;
+﻿using AirWaterStore.Web.Models.Ordering;
+
+namespace AirWaterStore.Web.Models.Catalog;
 
 public partial class Game
 {
@@ -10,7 +12,7 @@ public partial class Game
 
     public string? Description { get; set; }
 
-    public string? Genre { get; set; }
+    public List<string> Genre { get; set; } = new List<string>();
 
     public string? Developer { get; set; }
 
@@ -26,3 +28,7 @@ public partial class Game
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
+
+//wrapper classes
+public record GetGamesResponse(IEnumerable<Game> Games);
+public record GetGameByIdResponse(Game Game);

@@ -1,3 +1,5 @@
+using AirWaterStore.Web.Models.AirWaterStore;
+
 namespace AirWaterStore.Web.Pages.Admin.Users
 {
     public class IndexModel : PageModel

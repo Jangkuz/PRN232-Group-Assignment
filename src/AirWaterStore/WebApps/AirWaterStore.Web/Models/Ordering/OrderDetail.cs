@@ -1,4 +1,6 @@
-﻿namespace AirWaterStore.Web.Models;
+﻿using AirWaterStore.Web.Models.Catalog;
+
+namespace AirWaterStore.Web.Models.Ordering;
 
 public partial class OrderDetail
 {

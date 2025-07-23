@@ -11,7 +11,13 @@ public class GetGamesEndpoint : ICarterModule
     {
         app.MapGet("/games", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
-            var query = request.Adapt<GetGamesQuery>();
+            //var query = request.Adapt<GetGamesQuery>();
+
+            var query = new GetGamesQuery(new PaginationRequest
+            {
+                PageIndex = request.PageIndex,
+                PageSize = request.PageSize
+            });
 
             var result = await sender.Send(query);
 

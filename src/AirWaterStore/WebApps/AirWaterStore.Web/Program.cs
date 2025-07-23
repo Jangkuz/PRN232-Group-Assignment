@@ -1,4 +1,5 @@
 using AirWaterStore.Web.Hubs;
+using AirWaterStore.Web.Services;
 
 namespace AirWaterStore.Web
 {
@@ -17,6 +18,20 @@ namespace AirWaterStore.Web
             builder.Services.AddSignalR();
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddRefitClient<ICatalogService>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    return new HttpClientHandler
+                    {
+                        // Skip ssl, DEVELOPMENT ONLY
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+                })
+            ;
             ////Configure DbContext
             //builder.Services.AddDbContext<AirWaterStoreContext>(options =>
             // options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));
@@ -57,6 +72,7 @@ namespace AirWaterStore.Web
             app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

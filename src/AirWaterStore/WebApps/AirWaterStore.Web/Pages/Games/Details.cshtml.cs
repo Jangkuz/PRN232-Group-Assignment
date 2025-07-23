@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AirWaterStore.Web.Models.Catalog;
+using System.ComponentModel.DataAnnotations;
 
 namespace AirWaterStore.Web.Pages.Games
 {

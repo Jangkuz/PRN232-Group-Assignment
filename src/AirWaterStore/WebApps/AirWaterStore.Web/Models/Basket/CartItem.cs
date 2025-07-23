@@ -1,4 +1,4 @@
-﻿namespace AirWaterStore.Web.Models;
+﻿namespace AirWaterStore.Web.Models.Basket;
 
 public class CartItem
 {

@@ -1,3 +1,5 @@
+using AirWaterStore.Web.Models.Ordering;
+
 namespace AirWaterStore.Web.Pages.Orders
 {
     public class IndexModel : PageModel
