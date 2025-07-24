@@ -41,7 +41,7 @@ internal class CreateGameCommandHandler(
             Title = command.Title,
             ThumbnailUrl = command.ThumbnailUrl,
             Description = command.Description,
-            Genre = command.Genre,
+            Genres = command.Genre,
             Developer = command.Developer,
             Publisher = command.Publisher,
             ReleaseDate = command.ReleaseDate,

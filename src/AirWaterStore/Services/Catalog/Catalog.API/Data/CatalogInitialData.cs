@@ -49,11 +49,15 @@ public class CatalogInitialData  : IInitialData
 
     private static async Task<IEnumerable<Review>> GetPreconfigureReviewAsync()
     {
-        var rawList = await ReadReviewData.ReadMockDataAsync();
+        var reviewJsonList = await ReadReviewData.ReadMockDataAsync();
 
-        return rawList
+        var userJsonList = await ReadUserData.ReadMockDataAsync();
+
+        var reviews = reviewJsonList
             .Select(ConvertToReview)
             .ToList();
+
+        return MapUserName(reviews, userJsonList);
     }
 
     private static Game ConvertToGame(GameJsonDto dto)
@@ -67,7 +71,7 @@ public class CatalogInitialData  : IInitialData
             Title = dto.Title,
             ThumbnailUrl = dto.ThumbnailUrl,
             Description = dto.Description,
-            Genre = genreList ?? new List<string>(),
+            Genres = genreList ?? new List<string>(),
             Developer = dto.Developer,
             Publisher = dto.Publisher,
             ReleaseDate = ReadGameData.ParseDateOnly(dto.ReleaseDate),
@@ -87,5 +91,24 @@ public class CatalogInitialData  : IInitialData
             Comment = dto.Comment,
             ReviewDate = dto.ReviewDate
         };
+    }
+
+    private static IEnumerable<Review> MapUserName(IEnumerable<Review> reviews, IEnumerable<UserJsonDto> users)
+    {
+        var userDictionary = users.ToDictionary(u => u.UserId, u => u.UserName);
+
+        foreach (var review in reviews)
+        {
+            if (userDictionary.TryGetValue(review.Id, out var userName))
+            {
+                review.UserName = userName;
+            }
+            else
+            {
+                review.UserName = "Unknown";
+            }
+        }
+
+        return reviews;
     }
 }

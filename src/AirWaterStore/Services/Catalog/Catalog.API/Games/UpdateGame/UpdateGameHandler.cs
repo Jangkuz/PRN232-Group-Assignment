@@ -45,7 +45,7 @@ internal class UpdateGameHandler
         product.Title = command.Title;
         product.ThumbnailUrl = command.ThumbnailUrl;
         product.Description = command.Description;
-        product.Genre = command.Genre;
+        product.Genres = command.Genre;
         product.Developer = command.Developer;
         product.Publisher = command.Publisher;
         product.ReleaseDate = command.ReleaseDate;

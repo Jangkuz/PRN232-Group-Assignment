@@ -51,7 +51,7 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@game.Title</h5>
                     <p class="card-text">
-                        <small class="text-muted">@game.Genre</small><br />
+                        <small class="text-muted">@game.GenresString</small><br />
                         @if (game.Description?.Length > 100)
                         {
                             @(game.Description.Substring(0, 100))
@@ -68,14 +68,14 @@
                         </span>
                     </p>
                     <div class="btn-group" role="group">
-                        <a asp-page="/Games/Details" asp-route-id="@game.GameId" class="btn btn-info btn-sm">View
+                        <a asp-page="/Games/Details" asp-route-id="@game.Id" class="btn btn-info btn-sm">View
                             Details</a>
                         @* @if (Model.IsCustomer() && game.Quantity > 0)
                         {
                             <form method="post" asp-page-handler="AddToCart" class="d-inline">
                                 <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
                                 <input type="hidden" name="SearchString" value="@Model.SearchString" />
-                                <input type="hidden" name="gameId" value="@game.GameId" />
+                                <input type="hidden" name="gameId" value="@gaameId" />
                                 <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
                             </form>
                         } *@

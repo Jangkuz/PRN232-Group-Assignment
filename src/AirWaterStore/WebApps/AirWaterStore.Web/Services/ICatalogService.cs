@@ -8,4 +8,7 @@ public interface ICatalogService
 
     [Get("/catalog-service/games/{id}")]
     Task<GetGameByIdResponse> GetGame(int id);
+
+    [Get("/catalog-service/reviews/{gameId}")]
+    Task<GetReviewsByGameIdResponse> GetReviewsByGameId(int gameId);
 }

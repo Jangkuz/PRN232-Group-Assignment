@@ -10,7 +10,7 @@ public class Game
 
     public string? Description { get; set; }
 
-    public List<string> Genre { get; set; } = [];
+    public List<string> Genres { get; set; } = [];
 
     public string? Developer { get; set; }
 

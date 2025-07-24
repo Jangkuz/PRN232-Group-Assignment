@@ -20,7 +20,7 @@
         <div class="col-md-8">
             <h1>@Model.Game.Title</h1>
             <div class="mb-3">
-                <span class="badge badge-secondary text-dark">@Model.Game.Genre</span>
+                <span class="badge badge-secondary text-dark">@Model.Game.GenresString</span>
                 <span class="badge badge-@(Model.Game.Quantity > 0 ? "success" : "danger") text-dark">
                     @(Model.Game.Quantity > 0 ? $"{Model.Game.Quantity} in stock" : "Out of stock")
                 </span>
@@ -45,7 +45,7 @@
                 @if (Model.IsCustomer() && Model.Game.Quantity > 0)
                 {
                     <form method="post" asp-page-handler="AddToCart" class="form-inline">
-                        <input type="hidden" name="gameId" value="@Model.Game.GameId" />
+                        <input type="hidden" name="gameId" value="@Model.Game.Id" />
                         <label class="mr-2">Quantity:</label>
                         <input type="number" name="quantity" value="1" min="1" max="@Model.Game.Quantity"
                             class="form-control mr-2" style="width: 80px;">
@@ -54,8 +54,8 @@
                 }
                 @if (Model.IsStaff())
                 {
-                    <a asp-page="/Admin/Games/Edit" asp-route-id="@Model.Game.GameId" class="btn btn-warning">Edit Game</a>
-                    <a asp-page="/Admin/Games/Delete" asp-route-id="@Model.Game.GameId" class="btn btn-danger">Delete
+                    <a asp-page="/Admin/Games/Edit" asp-route-id="@Model.Game.Id" class="btn btn-warning">Edit Game</a>
+                    <a asp-page="/Admin/Games/Delete" asp-route-id="@Model.Game.Id" class="btn btn-danger">Delete
                         Game</a>
                 }
             </div>
@@ -75,7 +75,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Write a Review</h5>
                         <form method="post" asp-page-handler="AddReview">
-                            <input type="hidden" asp-for="NewReview.GameId" value="@Model.Game.GameId" />
+                            <input type="hidden" asp-for="NewReview.GameId" value="@Model.Game.Id" />
 
                             <div class="form-group">
                                 <label asp-for="NewReview.Rating">Rating</label>
@@ -140,7 +140,7 @@
                                 <div id="review-edit-@review.ReviewId" style="display: none;">
                                     <form method="post" asp-page-handler="UpdateReview">
                                         <input type="hidden" name="reviewId" value="@review.ReviewId" />
-                                        <input type="hidden" name="gameId" value="@Model.Game.GameId" />
+                                        <input type="hidden" name="gameId" value="@Model.Game.Id" />
 
                                         <div class="form-group">
                                             <label>Rating</label>

@@ -6,6 +6,8 @@ public class Review
 
     public int UserId { get; set; }
 
+    public string UserName { get; set; } = string.Empty;
+
     public int GameId { get; set; }
 
     public int? Rating { get; set; }

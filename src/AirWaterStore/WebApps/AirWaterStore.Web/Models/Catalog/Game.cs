@@ -4,7 +4,7 @@ namespace AirWaterStore.Web.Models.Catalog;
 
 public partial class Game
 {
-    public int GameId { get; set; }
+    public int Id { get; set; }
 
     public string? ThumbnailUrl { get; set; }
 
@@ -12,8 +12,16 @@ public partial class Game
 
     public string? Description { get; set; }
 
-    public List<string> Genre { get; set; } = new List<string>();
-
+    public List<string> Genres { get; set; } = [];
+    public string GenresString { get {
+            var result = "N/A.";
+            if (Genres != null && Genres.Any())
+            {
+                result = string.Join(", ", Genres.Take(4)) + ".";
+            }
+            return result;
+        } 
+    }
     public string? Developer { get; set; }
 
     public string? Publisher { get; set; }

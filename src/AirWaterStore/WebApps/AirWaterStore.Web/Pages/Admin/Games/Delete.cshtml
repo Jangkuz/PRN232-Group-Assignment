@@ -19,7 +19,7 @@
             <dd class="col-sm-9">@Model.Game.Title</dd>
 
             <dt class="col-sm-3">Genre</dt>
-            <dd class="col-sm-9">@(Model.Game.Genre)</dd>
+            <dd class="col-sm-9">@(Model.Game.GenresString)</dd>
 
             <dt class="col-sm-3">Developer</dt>
             <dd class="col-sm-9">@(Model.Game.Developer ?? "N/A")</dd>
@@ -41,9 +41,9 @@
         </dl>
 
         <form method="post">
-            <input type="hidden" asp-for="Game.GameId" />
+            <input type="hidden" asp-for="Game.Id" />
             <button type="submit" class="btn btn-danger">Delete</button>
-            <a asp-page="/Games/Details" asp-route-id="@Model.Game.GameId" class="btn btn-secondary">Cancel</a>
+            <a asp-page="/Games/Details" asp-route-id="@Model.Game.Id" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
     <div class="col-md-4">

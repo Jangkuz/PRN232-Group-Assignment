@@ -1,9 +1,13 @@
 ﻿using AirWaterStore.Web.Models.Catalog;
+using AirWaterStore.Web.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace AirWaterStore.Web.Pages.Games
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel(
+        ICatalogService catalogService,
+        ILogger<IndexModel> logger
+        ) : PageModel
     {
         //private readonly IGameService _gameService;
         //private readonly IReviewService _reviewService;
@@ -44,25 +48,29 @@ namespace AirWaterStore.Web.Pages.Games
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            //var game = await _gameService.GetByIdAsync(id);
-            //if (game == null)
-            //{
-            //    return NotFound();
-            //}
+            logger.LogInformation("Game detail visited");
+            var gameResult = await catalogService.GetGame(id);
+            var game = gameResult.Game;
+            if (game == null)
+            {
+                return NotFound();
+            }
 
-            //Game = game;
+            Game = game;
 
-            //Reviews = await _reviewService.GetAllByGameIdAsync(id);
+            var reviewResult = await catalogService.GetReviewsByGameId(id);
 
-            //// Load usernames for reviews
-            //foreach (var review in Reviews)
-            //{
-            //    if (!UserNames.ContainsKey(review.UserId))
-            //    {
-            //        var user = await _userService.GetByIdAsync(review.UserId);
-            //        UserNames[review.UserId] = user?.Username ?? "Unknown User";
-            //    }
-            //}
+            Reviews = reviewResult.Review.ToList();
+
+            // Load usernames for reviews
+            foreach (var review in Reviews)
+            {
+                if (!UserNames.ContainsKey(review.UserId))
+                {
+                    //var user = await _userService.GetByIdAsync(review.UserId);
+                    UserNames[review.UserId] = review.UserName;
+                }
+            }
 
             //// Check if current user can review (hasn't reviewed this game yet)
             //if (this.IsCustomer() && this.IsAuthenticated())

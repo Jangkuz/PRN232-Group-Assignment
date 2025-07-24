@@ -29,6 +29,8 @@ namespace AirWaterStore.Web.Pages.Games
             //    SuccessMessage = successMessgae.ToString();
             //}
 
+            logger.LogInformation("Game list visited");
+
             var result = await catalogService.GetGames(1, 1000); // Get all for filtering
 
             var allGames = result.Games;
@@ -38,7 +40,7 @@ namespace AirWaterStore.Web.Pages.Games
             {
                 allGames = allGames.Where(g =>
                     g.Title.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                    (g.Genre.ToString()?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (g.GenresString?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
                     (g.Developer?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false)
                 ).ToList();
             }
