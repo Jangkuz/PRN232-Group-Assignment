@@ -1,4 +1,4 @@
-﻿namespace AirWaterStore.API.Helper;
+﻿namespace AirWaterStore.Web.Helper;
 
 public static class AppConst
 {
@@ -11,4 +11,5 @@ public static class AppConst
     public static readonly string UserNameClaim = "UserName";
     public static readonly string IsBanClaim = "IsBan";
 
+    public static readonly string Cookie = "access_token";
 }

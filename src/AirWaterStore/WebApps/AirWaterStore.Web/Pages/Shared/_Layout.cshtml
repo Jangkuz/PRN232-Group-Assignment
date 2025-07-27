@@ -1,12 +1,12 @@
 ﻿@using AirWaterStore.Web.Helper
 @using AirWaterStore.Web.Models.Basket
 @{
-    var userId = Context.Session.GetInt32(SessionParams.UserId);
-    var username = Context.Session.GetString(SessionParams.UserName);
-    var userRole = Context.Session.GetInt32(SessionParams.UserRole);
-    var isAuthenticated = userId.HasValue;
-    var isStaff = userRole == 2;
-    var isCustomer = userRole == 1;
+    var userId = User.GetUserId();
+    var username = User.GetUserName();
+    var userRole = User.GetRole();
+    var isAuthenticated = userId != 0;
+    var isStaff = User.IsStaff();
+    var isCustomer = User.IsCustomer();
 
     // Get cart count
     var cartItems = Context.Session.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();

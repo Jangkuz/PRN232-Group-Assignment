@@ -1,5 +1,8 @@
-using AirWaterStore.Web.Hubs;
+﻿using AirWaterStore.Web.Hubs;
 using AirWaterStore.Web.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AirWaterStore.Web
 {
@@ -22,16 +25,47 @@ namespace AirWaterStore.Web
                 .ConfigureHttpClient(c =>
                 {
                     c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() =>
+                });
+
+            builder.Services.AddRefitClient<IAirWaterStoreService>()
+                .ConfigureHttpClient(c =>
                 {
-                    return new HttpClientHandler
+                    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
+                });
+
+
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        // Skip ssl, DEVELOPMENT ONLY
-                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
                     };
-                })
-            ;
+
+                    // 🔑 Read token from cookie instead of header
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var token = context.Request.Cookies[AppConst.Cookie];
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                context.Token = token;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+
             ////Configure DbContext
             //builder.Services.AddDbContext<AirWaterStoreContext>(options =>
             // options.UseSqlServer(builder.Configuration.GetConnectionString("DockerConnection")));

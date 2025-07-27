@@ -4,7 +4,7 @@ namespace AirWaterStore.Web.Models.Catalog;
 
 public partial class Review
 {
-    public int ReviewId { get; set; }
+    public int Id { get; set; }
 
     public int UserId { get; set; }
 
@@ -20,4 +20,24 @@ public partial class Review
 
 }
 
-public record GetReviewsByGameIdResponse(IEnumerable<Review> Review);
+public record GetReviewsByGameIdResponse(IEnumerable<Review> Reviews);
+
+public record CreateReviewDto(
+    int UserId,
+    string UserName,
+    int GameId,
+    int Rating,
+    string Comment,
+    DateTime ReviewDate
+    );
+
+public record UpdateReviewDto(
+    int Id,
+    int Rating,
+    string Comment
+    );
+
+public record PostReviewResponse(int Id);
+
+public record PutReviewResponse(bool IsSuccess);
+public record DeleteReviewResponse(bool IsSuccess);

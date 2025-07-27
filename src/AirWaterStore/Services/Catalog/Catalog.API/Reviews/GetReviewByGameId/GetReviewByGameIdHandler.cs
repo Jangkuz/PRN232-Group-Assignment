@@ -1,6 +1,6 @@
 ﻿namespace Catalog.API.Reviews.GetReviewByGameId;
 public record GetReviewByGameIdQuery(int GameId) : IQuery<GetReviewByGameIdResult>;
-public record GetReviewByGameIdResult(IEnumerable<Review> Review);
+public record GetReviewByGameIdResult(IEnumerable<Review> Reviews);
 internal class GetReviewByGameIdHandler
     (IDocumentSession session)
     : IQueryHandler<GetReviewByGameIdQuery, GetReviewByGameIdResult>

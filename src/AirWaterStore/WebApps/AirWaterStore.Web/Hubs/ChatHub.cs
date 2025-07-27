@@ -21,7 +21,7 @@ namespace AirWaterStore.Web.Hubs
         public override async Task OnConnectedAsync()
         {
             var userId = GetUserId();
-            if (userId.HasValue)
+            if (userId != 0)
             {
                 // Add user to their personal group
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user-{userId}");
@@ -33,7 +33,7 @@ namespace AirWaterStore.Web.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var userId = GetUserId();
-            if (userId.HasValue)
+            if (userId != 0)
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user-{userId}");
             }
@@ -115,7 +115,7 @@ namespace AirWaterStore.Web.Hubs
             var userId = GetUserId();
             var username = GetUsername();
 
-            if (userId.HasValue)
+            if (userId != 0)
             {
                 await Clients.OthersInGroup($"chatroom-{chatRoomId}").SendAsync("UserTyping", new
                 {
@@ -126,22 +126,22 @@ namespace AirWaterStore.Web.Hubs
             }
         }
 
-        private int? GetUserId()
+        private int GetUserId()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.Session.GetInt32(SessionParams.UserId);
+            var user = _httpContextAccessor.HttpContext?.User;
+            return user != null ? user.GetUserId() : 0;
         }
 
-        private int? GetUserRole()
+        private string GetUserRole()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.Session.GetInt32(SessionParams.UserRole);
+            var user = _httpContextAccessor.HttpContext?.User;
+            return user != null ? user.GetRole() : "";
         }
 
         private string GetUsername()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.Session.GetString(SessionParams.UserName) ?? "Unknown User";
+            var user = _httpContextAccessor.HttpContext?.User;
+            return user != null ? user.GetUserName() : "";
         }
     }
 }

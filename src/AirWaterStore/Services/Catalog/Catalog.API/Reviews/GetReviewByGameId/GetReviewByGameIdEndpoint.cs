@@ -1,7 +1,7 @@
 ﻿namespace Catalog.API.Reviews.GetReviewByGameId;
 
 //public record GetReviewByIdRequest();
-public record GetReviewByGameIdResponse(IEnumerable<Review> Review);
+public record GetReviewByGameIdResponse(IEnumerable<Review> Reviews);
 
 public class GetReviewByGameIdEndpoint : ICarterModule
 {

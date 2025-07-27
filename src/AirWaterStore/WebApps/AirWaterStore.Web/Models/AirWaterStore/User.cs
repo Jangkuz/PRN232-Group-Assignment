@@ -5,7 +5,7 @@ namespace AirWaterStore.Web.Models.AirWaterStore;
 
 public partial class User
 {
-    public int UserId { get; set; }
+    public int Id { get; set; }
 
     public string Username { get; set; } = null!;
 
@@ -17,13 +17,20 @@ public partial class User
 
     public bool? IsBan { get; set; }
 
-    public virtual ICollection<ChatRoom> ChatRoomCustomers { get; set; } = new List<ChatRoom>();
-
-    public virtual ICollection<ChatRoom> ChatRoomStaffs { get; set; } = new List<ChatRoom>();
-
-    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
-
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
+
+public record LoginDto
+(
+    string Email,
+    string Password
+);
+
+public record LoginTokenResponse(string Token);
+
+public record RegisterDto(
+    string Username,
+    string Email,
+    string Password
+    );
+
+public record RegisterResponse(int Id);

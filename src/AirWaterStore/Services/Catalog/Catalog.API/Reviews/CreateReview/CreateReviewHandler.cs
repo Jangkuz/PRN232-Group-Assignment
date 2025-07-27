@@ -1,6 +1,7 @@
 ﻿namespace Catalog.API.Reviews.CreateReview;
 public record CreateReviewCommand(
     int UserId,
+    string UserName,
     int GameId,
     int Rating,
     string Comment,
@@ -13,6 +14,7 @@ public class CreateReviewCommandValidator : AbstractValidator<CreateReviewComman
     public CreateReviewCommandValidator()
     {
         RuleFor(x => x.UserId).NotEmpty().WithMessage("UserId is required");
+        RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
         RuleFor(x => x.GameId).NotEmpty().WithMessage("GameId is required");
         RuleFor(x => x.Rating).NotEmpty().WithMessage("Rating is required");
         RuleFor(x => x.Comment).NotEmpty().WithMessage("Comment is required");
@@ -31,6 +33,7 @@ internal class CreateReviewCommandHandler(IDocumentSession session) : ICommandHa
         var review = new Review
         {
             UserId = command.UserId,
+            UserName = command.UserName,
             GameId = command.GameId,
             Rating = command.Rating,
             Comment = command.Comment,

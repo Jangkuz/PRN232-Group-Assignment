@@ -1,15 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Text.Json;
 
 namespace AirWaterStore.Web.Pages
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel(
+    IAirWaterStoreService airWaterStoreService,
+    ILogger<LoginModel> logger
+    ) : PageModel
     {
-        //private readonly IUserService _userService;
-
-        //public RegisterModel(IUserService userService)
-        //{
-        //    _userService = userService;
-        //}
 
         [BindProperty]
         public RegisterInputModel RegisterInput { get; set; } = default!;
@@ -41,52 +40,54 @@ namespace AirWaterStore.Web.Pages
         {
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return Page();
-        //    }
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
 
-        //    try
-        //    {
-        //        var newUser = new User
-        //        {
-        //            Username = RegisterInput.Username,
-        //            Email = RegisterInput.Email,
-        //            Password = RegisterInput.Password,
-        //            Role = 1, // Customer by default
-        //            IsBan = false
-        //        };
+            try
+            {
 
-        //        await _userService.AddAsync(newUser);
+                var result = await airWaterStoreService.PostRegister(new RegisterDto(
+                    RegisterInput.Username,
+                    RegisterInput.Email,
+                    RegisterInput.Password
+                    ));
 
-        //        // Auto-login after registration
-        //        HttpContext.Session.SetInt32(SessionParams.UserId, newUser.UserId);
-        //        HttpContext.Session.SetString(SessionParams.UserName, newUser.Username);
-        //        HttpContext.Session.SetInt32(SessionParams.UserRole, newUser.Role);
 
-        //        return RedirectToPage("/Games/Index");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle duplicate username/email
-        //        if (ex.InnerException?.Message.Contains("UNIQUE") == true)
-        //        {
-        //            if (ex.InnerException.Message.Contains("Email"))
-        //                ErrorMessage = "This email is already registered.";
-        //            else if (ex.InnerException.Message.Contains(SessionParams.UserName))
-        //                ErrorMessage = "This username is already taken.";
-        //            else
-        //                ErrorMessage = "Registration failed. Please try again.";
-        //        }
-        //        else
-        //        {
-        //            ErrorMessage = "An error occurred during registration.";
-        //        }
+                return RedirectToPage("/Login");
+            }
+            catch (ApiException ex)
+            {
+                logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
 
-        //        return Page();
-        //    }
-        //}
+                // Attempt to read the response content
+                if (ex.HasContent)
+                {
+                    // Use System.Text.Json to parse the content
+                    using var doc = JsonDocument.Parse(ex.Content!);
+                    if (doc.RootElement.TryGetProperty("detail", out var detailProp))
+                    {
+                        var detailMessage = detailProp.GetString();
+                        // Show to user or handle it
+                        ErrorMessage = detailMessage!;
+                    }
+                    else
+                    {
+                        // fallback: show entire content
+                        ErrorMessage = ex.Content!;
+                    }
+                }
+                else
+                {
+                    // fallback: no content
+                    ErrorMessage = "An unexpected error occurred."!;
+                }
+
+                return Page();
+            }
+        }
     }
 }

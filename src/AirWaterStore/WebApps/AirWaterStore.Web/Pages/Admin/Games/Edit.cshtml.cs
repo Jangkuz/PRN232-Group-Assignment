@@ -1,62 +1,76 @@
 using AirWaterStore.Web.Models.Catalog;
 
-namespace AirWaterStore.Web.Pages.Admin.Games
+namespace AirWaterStore.Web.Pages.Admin.Games;
+
+public class EditModel(
+    ICatalogService catalogService,
+    ILogger<EditModel> logger
+    ) : PageModel
 {
-    public class EditModel : PageModel
+
+    [BindProperty]
+    public Game Game { get; set; } = default!;
+
+    public async Task<IActionResult> OnGetAsync(int id)
     {
-        //private readonly IGameService _gameService;
-
-        //public EditModel(IGameService gameService)
-        //{
-        //    _gameService = gameService;
-        //}
-
-        [BindProperty]
-        public Game Game { get; set; } = default!;
-
-        public async Task<IActionResult> OnGetAsync(int id)
+        // Check if user is staff
+        if (!this.IsStaff())
         {
-            //// Check if user is staff
-            //if (HttpContext.Session.GetInt32(SessionParams.UserRole) != 2)
-            //{
-            //    return RedirectToPage("/Login");
-            //}
+            return RedirectToPage("/Login");
+        }
 
-            //var game = await _gameService.GetByIdAsync(id);
+        var game = await catalogService.GetGame(id);
 
-            //if (game == null)
-            //{
-            //    return NotFound();
-            //}
+        if (game == null)
+        {
+            return NotFound();
+        }
 
-            //Game = game;
+        Game = game.Game;
 
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!this.IsStaff())
+        {
+            return RedirectToPage("/Login");
+        }
+
+        if (!ModelState.IsValid)
+        {
             return Page();
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    if (!this.IsStaff())
-        //    {
-        //        return RedirectToPage("/Login");
-        //    }
+        logger.LogInformation("Update review visited");
 
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return Page();
-        //    }
+        try
+        {
+            var gameDto = new UpdateGameDto(
+                Id: Game.Id,
+                ThumbnailUrl: Game.ThumbnailUrl!,
+                Title: Game.Title,
+                Description: Game.Description!,
+                Genre: Game.Genres,
+                Developer: Game.Developer!,
+                Publisher: Game.Publisher!,
+                ReleaseDate: (DateOnly)Game.ReleaseDate!,
+                Price: Game.Price,
+                Quantity: Game.Quantity
+                );
 
-        //    try
-        //    {
-        //        await _gameService.UpdateAsync(Game);
-        //        TempData["SuccessMessage"] = "Game updated successfully!";
-        //        return RedirectToPage("/Games/Details", new { id = Game.GameId });
-        //    }
-        //    catch
-        //    {
-        //        ModelState.AddModelError(string.Empty, "An error occurred while updating the game.");
-        //        return Page();
-        //    }
-        //}
+            await catalogService.PutGame(gameDto);
+
+            TempData["SuccessMessage"] = "Game updated successfully!";
+            return RedirectToPage("/Games/Details", new { id = Game.Id });
+        }
+        catch (ApiException ex)
+        {
+
+            logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            ModelState.AddModelError(string.Empty, "An error occurred while updating the game.");
+        }
+        return Page();
     }
 }

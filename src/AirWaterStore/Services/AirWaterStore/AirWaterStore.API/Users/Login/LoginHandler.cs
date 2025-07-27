@@ -32,8 +32,9 @@ internal class LoginHandler(
         var claims = new List<Claim>
         {
             new Claim(AppConst.UserIdClaim, user.Id.ToString()),
-            new Claim(AppConst.RoleClaim, roles.ToString()!),
-            new Claim(AppConst.UserNameClaim, user.UserName!)
+            new Claim(AppConst.RoleClaim, roles[0]!),
+            new Claim(AppConst.UserNameClaim, user.UserName!),
+            new Claim(AppConst.IsBanClaim, user.IsBan.ToString()!)
         };
 
         foreach (var role in roles)

@@ -2,6 +2,7 @@
 
 public record CreateReviewRequest(
     int UserId,
+    string UserName,
     int GameId,
     int Rating,
     string Comment,

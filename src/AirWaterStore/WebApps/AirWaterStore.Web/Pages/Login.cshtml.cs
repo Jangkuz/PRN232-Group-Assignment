@@ -1,73 +1,117 @@
+using AirWaterStore.Web.Services;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 
-namespace AirWaterStore.Web.Pages
+namespace AirWaterStore.Web.Pages;
+
+public class LoginModel(
+    IAirWaterStoreService airWaterStoreService,
+    ILogger<LoginModel> logger
+    ) : PageModel
 {
-    public class LoginModel : PageModel
+
+    [BindProperty]
+    public LoginInputModel LoginInput { get; set; } = default!;
+
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    public class LoginInputModel
     {
-        //private readonly IUserService _userService;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
-        //public LoginModel(IUserService userService)
-        //{
-        //    _userService = userService;
-        //}
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+    }
 
-        [BindProperty]
-        public LoginInputModel LoginInput { get; set; } = default!;
+    public void OnGet()
+    {
+        // Clear session on login page
+        HttpContext.Session.Clear();
+    }
 
-        public string ErrorMessage { get; set; } = string.Empty;
-
-        public class LoginInputModel
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
         {
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; } = string.Empty;
-
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; } = string.Empty;
+            return Page();
         }
 
-        public void OnGet()
+        try
         {
-            // Clear session on login page
-            HttpContext.Session.Clear();
+
+            var result = await airWaterStoreService.PostLogin(new LoginDto(
+                LoginInput.Email,
+                LoginInput.Password
+                ));
+
+
+            //Store token in HttpOnly cookie
+            HttpContext.Response.Cookies.Append(AppConst.Cookie, result.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddHours(1)
+            });
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = result.Token;
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var userIdClaim = int.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type.Equals(AppConst.UserIdClaim))?.Value, out int id) ? id : 0;
+            var userIsBanClaim = bool.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type.Equals(AppConst.IsBanClaim))?.Value, out bool isBan) ? isBan : false;
+
+            var userRoleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type.Equals(AppConst.RoleClaim))?.Value ?? "";
+            if (userIdClaim != 0)
+            {
+                if (userIsBanClaim)
+                {
+                    ErrorMessage = "Your account has been banned.";
+                    return Page();
+                }
+
+                // Redirect based on role
+                if (userRoleClaim.Equals(AppConst.Staff)) // Staff
+                {
+                    return RedirectToPage("/Admin/Dashboard");
+                }
+                else
+                {
+                    return RedirectToPage("/Games/Index");
+                }
+            }
+
+            return Page();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+
+            if (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                // Optionally parse JSON error from content
+                //TODO: show model error
+                ModelState.AddModelError(string.Empty, "Invalid login credentials.");
+                ErrorMessage = "Invalid login credentials.";
+            }
+            else if (ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                ModelState.AddModelError(string.Empty, "Unauthorized.");
+                ErrorMessage = "Unauthorized.";
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Server error. Try again later.");
+                ErrorMessage = "Server error. Try again later.";
+            }
+
+            return Page();
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return Page();
-        //    }
-
-        //    var user = await _userService.LoginAsync(LoginInput.Email, LoginInput.Password);
-
-        //    if (user != null)
-        //    {
-        //        if (user.IsBan == true)
-        //        {
-        //            ErrorMessage = "Your account has been banned.";
-        //            return Page();
-        //        }
-
-        //        // Set session
-        //        HttpContext.Session.SetInt32(SessionParams.UserId, user.UserId);
-        //        HttpContext.Session.SetString(SessionParams.UserName, user.Username);
-        //        HttpContext.Session.SetInt32(SessionParams.UserRole, user.Role);
-
-        //        // Redirect based on role
-        //        if (user.Role == 2) // Staff
-        //        {
-        //            return RedirectToPage("/Admin/Dashboard");
-        //        }
-        //        else // Customer
-        //        {
-        //            return RedirectToPage("/Games/Index");
-        //        }
-        //    }
-
-        //    ErrorMessage = "Invalid email or password.";
-        //    return Page();
-        //}
     }
 }
+

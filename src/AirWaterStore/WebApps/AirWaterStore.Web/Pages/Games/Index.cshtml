@@ -20,12 +20,12 @@
             </div>
         </form>
     </div>
-    @* @if (Model.IsStaff())
+    @if (Model.IsStaff())
     {
         <div class="col-md-6 text-right">
             <a asp-page="/Admin/Games/Create" class="btn btn-success">Add New Game</a>
         </div>
-    } *@
+    }
 </div>
 
 @if (Model.SuccessMessage != null)
@@ -51,7 +51,7 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@game.Title</h5>
                     <p class="card-text">
-                        <small class="text-muted">@game.GenresString</small><br />
+                        <small class="text-muted">@string.Join(", ",game.Genres.Take(4)).</small><br />
                         @if (game.Description?.Length > 100)
                         {
                             @(game.Description.Substring(0, 100))
@@ -70,15 +70,15 @@
                     <div class="btn-group" role="group">
                         <a asp-page="/Games/Details" asp-route-id="@game.Id" class="btn btn-info btn-sm">View
                             Details</a>
-                        @* @if (Model.IsCustomer() && game.Quantity > 0)
+                        @if (Model.IsCustomer() && game.Quantity > 0)
                         {
                             <form method="post" asp-page-handler="AddToCart" class="d-inline">
                                 <input type="hidden" name="CurrentPage" value="@Model.CurrentPage" />
                                 <input type="hidden" name="SearchString" value="@Model.SearchString" />
-                                <input type="hidden" name="gameId" value="@gaameId" />
+                                <input type="hidden" name="gameId" value="@game.Id" />
                                 <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
                             </form>
-                        } *@
+                        }
                     </div>
                 </div>
             </div>
