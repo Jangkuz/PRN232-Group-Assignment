@@ -9,8 +9,14 @@ public interface ICatalogService
     [Get("/catalog-service/games/{id}")]
     Task<GetGameByIdResponse> GetGame(int id);
 
+    [Post("/catalog-service/games")]
+    Task<CreateGameResponse> PostGame(CreateGameDto gameDto);
+
     [Put("/catalog-service/games")]
     Task<UpdateGameResponse> PutGame(UpdateGameDto gameDto);
+
+    [Delete("/catalog-service/games/{gameId}")]
+    Task<DeleteGameResponse> DeleteGame(int gameId);
 
     [Get("/catalog-service/reviews/{gameId}")]
     Task<GetReviewsByGameIdResponse> GetReviewsByGameId(int gameId);

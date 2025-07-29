@@ -25,6 +25,7 @@ public class BasketCheckoutEventHandler
         var orderDto = new OrderDto(
             Id: orderId,
             CustomerId: message.CustomerId,
+            CustomerName: "",
             OrderName: message.UserName,
             //Payment: paymentDto,
             Status: Ordering.Domain.Enums.OrderStatus.Pending,

@@ -9,6 +9,7 @@ public class GetOrdersByNameHandler(IApplicationDbContext dbContext)
 
         var orders = await dbContext.Orders
                 .Include(o => o.OrderItems)
+                .Include(o => o.Customer)
                 .AsNoTracking()
                 .Where(o => o.Id.Value.Equals(query.OrderId))
                 .OrderBy(o => o.Id.Value)

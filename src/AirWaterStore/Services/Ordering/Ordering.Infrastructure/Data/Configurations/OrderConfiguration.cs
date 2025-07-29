@@ -12,7 +12,13 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                         orderId => orderId.Value,
                         dbId => OrderId.Of(dbId));
 
-        builder.HasOne<Customer>()
+        builder.Property(o => o.CustomerId)
+            .HasConversion(
+            id => id.Value,
+            value => CustomerId.Of(value))
+            .HasColumnName("CustomerId");
+
+        builder.HasOne(o => o.Customer)
           .WithMany()
           .HasForeignKey(o => o.CustomerId)
           .IsRequired();

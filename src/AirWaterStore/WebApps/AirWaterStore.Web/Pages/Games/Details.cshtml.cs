@@ -35,6 +35,9 @@ namespace AirWaterStore.Web.Pages.Games
         public async Task<IActionResult> OnGetAsync(int id)
         {
             logger.LogInformation("Game detail visited");
+
+            try
+            {
             var gameResult = await catalogService.GetGame(id);
             var game = gameResult.Game;
             if (game == null)
@@ -64,6 +67,13 @@ namespace AirWaterStore.Web.Pages.Games
             }
 
             return Page();
+            } catch(ApiException ex)
+            {
+
+            logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+                return RedirectToPage(AppRouting.Home);
+            }
+
         }
 
         //public async Task<IActionResult> OnPostAddToCartAsync(int gameId, int quantity = 1)
@@ -107,7 +117,7 @@ namespace AirWaterStore.Web.Pages.Games
         {
             if (!this.IsAuthenticated() || !this.IsCustomer())
             {
-                return RedirectToPage("/Login");
+                return RedirectToPage(AppRouting.Login);
             }
 
             if (!ModelState.IsValid || !this.IsAuthenticated())
@@ -144,7 +154,7 @@ namespace AirWaterStore.Web.Pages.Games
         {
             if (!this.IsAuthenticated() || !this.IsCustomer())
             {
-                return RedirectToPage("/Login");
+                return RedirectToPage(AppRouting.Login);
             }
 
             logger.LogInformation("Update review visited");
@@ -174,7 +184,7 @@ namespace AirWaterStore.Web.Pages.Games
         {
             if (!this.IsAuthenticated() || !this.IsCustomer())
             {
-                return RedirectToPage("/Login");
+                return RedirectToPage(AppRouting.Login);
             }
 
             logger.LogInformation("Delete review visited");

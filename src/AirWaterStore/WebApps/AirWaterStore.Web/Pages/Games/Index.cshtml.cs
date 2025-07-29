@@ -22,12 +22,12 @@ namespace AirWaterStore.Web.Pages.Games
 
         public async Task<IActionResult> OnGetAsync()
         {
-            //// Get success message from TempData
-            //var successMessgae = TempData["SuccessMessage"];
-            //if (successMessgae != null)
-            //{
-            //    SuccessMessage = successMessgae.ToString();
-            //}
+            // Get success message from TempData
+            var successMessgae = TempData["SuccessMessage"];
+            if (successMessgae != null)
+            {
+                SuccessMessage = successMessgae.ToString();
+            }
 
             logger.LogInformation("Game list visited");
 

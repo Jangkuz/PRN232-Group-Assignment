@@ -14,6 +14,8 @@ public class Order : Aggregate<OrderId>
         private set { }
     }
 
+    public Customer Customer { get; private set; } = default!;
+
     public static Order Create(
         OrderId id, 
         CustomerId customerId, 

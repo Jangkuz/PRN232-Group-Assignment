@@ -1,58 +1,63 @@
 using AirWaterStore.Web.Models.Catalog;
 
-namespace AirWaterStore.Web.Pages.Admin.Games
+namespace AirWaterStore.Web.Pages.Admin.Games;
+
+public class DeleteModel(
+ICatalogService catalogService,
+ILogger<DeleteModel> logger
+) : PageModel
 {
-    public class DeleteModel : PageModel
+
+
+    [BindProperty]
+    public Game Game { get; set; } = default!;
+
+    public async Task<IActionResult> OnGetAsync(int id)
     {
-        //private readonly IGameService _gameService;
-
-        //public DeleteModel(IGameService gameService)
-        //{
-        //    _gameService = gameService;
-        //}
-
-        [BindProperty]
-        public Game Game { get; set; } = default!;
-
-        public async Task<IActionResult> OnGetAsync(int id)
+        //Check if user is staff
+        if (!this.IsStaff())
         {
-            // Check if user is staff
-            //if (!this.IsStaff())
-            //{
-            //    return RedirectToPage("/Login");
-            //}
-
-            //var game = await _gameService.GetByIdAsync(id);
-
-            //if (game == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //Game = game;
-
-            return Page();
+            return RedirectToPage(AppRouting.Login);
         }
 
-        //public async Task<IActionResult> OnPostAsync(int id)
-        //{
-        //    if (HttpContext.Session.GetInt32(SessionParams.UserRole) != 2)
-        //    {
-        //        return RedirectToPage("/Login");
-        //    }
+        try
+        {
+            logger.LogInformation("Delete game visited");
+            
+            var game = await catalogService.GetGame(id);
 
-        //    try
-        //    {
-        //        await _gameService.DeleteAsync(id);
-        //        TempData["SuccessMessage"] = "Game deleted successfully!";
-        //        return RedirectToPage("/Games/Index");
-        //    }
-        //    catch
-        //    {
-        //        // If deletion fails (e.g., due to foreign key constraints)
-        //        TempData["ErrorMessage"] = "Cannot delete this game because it has associated orders or reviews.";
-        //        return RedirectToPage("/Games/Details", new { id = id });
-        //    }
-        //}
+            Game = game.Game;
+            return Page();
+        }
+        catch (ApiException ex)
+
+        {
+
+            logger.LogWarning("Delete game failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+
+            return NotFound();
+        }
+    }
+
+    public async Task<IActionResult> OnPostAsync(int id)
+    {
+        if (!this.IsStaff())
+        {
+            return RedirectToPage(AppRouting.Login);
+        }
+
+        try
+        {
+            await catalogService.DeleteGame(id);
+            TempData["SuccessMessage"] = "Game deleted successfully!";
+            return RedirectToPage(AppRouting.Home);
+        }
+        catch (ApiException ex)
+        {
+            logger.LogWarning("Delete game failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            // If deletion fails (e.g., due to foreign key constraints)
+            TempData["ErrorMessage"] = "Cannot delete this game because it has associated orders or reviews.";
+            return RedirectToPage(AppRouting.GameDetail, new { id = id });
+        }
     }
 }

@@ -2,6 +2,7 @@
 global using AirWaterStore.API.Dtos;
 global using AirWaterStore.API.Helper;
 global using AirWaterStore.API.Models;
+global using AirWaterStore.API.Exceptions;
 global using BuildingBlocks.Behaviors;
 global using BuildingBlocks.CQRS;
 global using BuildingBlocks.Exceptions;

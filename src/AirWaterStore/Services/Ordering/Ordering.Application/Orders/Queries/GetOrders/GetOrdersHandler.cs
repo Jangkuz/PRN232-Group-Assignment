@@ -16,6 +16,7 @@ public class GetOrdersHandler(IApplicationDbContext dbContext)
 
         var orders = await dbContext.Orders
                        .Include(o => o.OrderItems)
+                       .Include(o => o.Customer)
                        .OrderBy(o => o.OrderName.Value)
                        .Skip(pageSize * pageIndex)
                        .Take(pageSize)

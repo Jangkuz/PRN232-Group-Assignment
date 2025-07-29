@@ -5,7 +5,7 @@ namespace AirWaterStore.Web.Pages
         public IActionResult OnGet()
         {
             HttpContext.Response.Cookies.Delete(AppConst.Cookie);
-            return RedirectToPage("/Login");
+            return RedirectToPage(AppRouting.Login);
         }
     }
 }

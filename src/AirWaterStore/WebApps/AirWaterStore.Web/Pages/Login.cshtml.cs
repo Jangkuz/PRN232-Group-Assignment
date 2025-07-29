@@ -77,11 +77,11 @@ public class LoginModel(
                 // Redirect based on role
                 if (userRoleClaim.Equals(AppConst.Staff)) // Staff
                 {
-                    return RedirectToPage("/Admin/Dashboard");
+                    return RedirectToPage(AppRouting.AdminDashboard);
                 }
                 else
                 {
-                    return RedirectToPage("/Games/Index");
+                    return RedirectToPage(AppRouting.Home);
                 }
             }
 

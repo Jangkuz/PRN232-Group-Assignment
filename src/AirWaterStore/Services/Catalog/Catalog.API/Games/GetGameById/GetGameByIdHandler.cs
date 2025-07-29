@@ -1,7 +1,7 @@
 ﻿namespace Catalog.API.Games.GetGameById;
 public record GetGameByIdQuery(int Id) : IQuery<GetGameByIdResult>;
 public record GetGameByIdResult(Game Game);
-public class GetReviewByGameIdHandler
+internal class GetReviewByGameIdHandler
     (IDocumentSession session)
     : IQueryHandler<GetGameByIdQuery, GetGameByIdResult>
 {

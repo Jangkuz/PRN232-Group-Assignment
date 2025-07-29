@@ -1,46 +1,64 @@
 using AirWaterStore.Web.Models.Catalog;
 
-namespace AirWaterStore.Web.Pages.Admin.Games
+namespace AirWaterStore.Web.Pages.Admin.Games;
+
+public class CreateModel(
+    ICatalogService catalogService,
+    ILogger<CreateModel> logger
+    ) : PageModel
 {
-    public class CreateModel : PageModel
+
+    [BindProperty]
+    public Game Game { get; set; } = default!;
+
+    public IActionResult OnGet()
     {
-        //private readonly IGameService _gameService;
-
-        //public CreateModel(IGameService gameService)
-        //{
-        //    _gameService = gameService;
-        //}
-
-        [BindProperty]
-        public Game Game { get; set; } = default!;
-
-        public IActionResult OnGet()
+        // Check if user is staff
+        if (!this.IsStaff())
         {
-            //// Check if user is staff
-            //if (!this.IsStaff())
-            //{
-            //    return RedirectToPage("/Login");
-            //}
+            return RedirectToPage(AppRouting.Login);
+        }
 
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!this.IsStaff())
+        {
+            return RedirectToPage(AppRouting.Login);
+        }
+
+        if (!ModelState.IsValid)
+        {
             return Page();
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    if (HttpContext.Session.GetInt32(SessionParams.UserRole) != 2)
-        //    {
-        //        return RedirectToPage("/Login");
-        //    }
+        try
+        {
 
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return Page();
-        //    }
+            var gameDto = new CreateGameDto(
+                ThumbnailUrl: Game.ThumbnailUrl!,
+                Title: Game.Title!,
+                Description: Game.Description!,
+                Genre: Game.Genres,
+                Developer: Game.Developer!,
+                Publisher: Game.Publisher!,
+                ReleaseDate: (DateOnly)Game.ReleaseDate!,
+                Price: Game.Price,
+                Quantity: Game.Quantity
+                );
 
-        //    await _gameService.AddAsync(Game);
+            await catalogService.PostGame(gameDto);
 
-        //    TempData["SuccessMessage"] = "Game created successfully!";
-        //    return RedirectToPage("/Games/Index");
-        //}
+            TempData["SuccessMessage"] = "Game created successfully!";
+
+        }
+        catch (ApiException ex)
+        {
+
+            logger.LogWarning("Create game failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+        }
+        return RedirectToPage(AppRouting.Home);
     }
 }

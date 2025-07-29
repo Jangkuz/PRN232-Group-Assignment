@@ -16,6 +16,7 @@ public class UserMapper(UserManager<User> userManager)
     {
         return new UserDto(
             Id: user.Id,
+            UserName: user.UserName,
             Email: user.Email,
             IsBan: user.IsBan,
             Roles: userManager.GetRolesAsync(user).GetAwaiter().GetResult()

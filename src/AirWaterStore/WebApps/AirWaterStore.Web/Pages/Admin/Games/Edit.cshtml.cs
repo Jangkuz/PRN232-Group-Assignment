@@ -68,7 +68,7 @@ public class EditModel(
         catch (ApiException ex)
         {
 
-            logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            logger.LogWarning("Update review: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
             ModelState.AddModelError(string.Empty, "An error occurred while updating the game.");
         }
         return Page();
