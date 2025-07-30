@@ -25,7 +25,7 @@
                 {
                     <tr>
                         <td>
-                            <a asp-page="/Games/Details" asp-route-id="@item.GameId">@item.Title</a>
+                            <a asp-page="/Games/Details" asp-route-id="@item.GameId">@item.GameTitle</a>
                         </td>
                         <td>@item.Price.ToString("C", Currency.VnCurrencyFormat)</td>
                         <td>

@@ -20,11 +20,11 @@ public class StoreBasketEndpoint : ICarterModule
 
             return Results.Created($"/basket/{response.UserId}", response);
         })
-        .WithName("CreateGame")
+        .WithName("CreateBasket")
         .Produces<StoreBasketResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Create Game")
-        .WithDescription("Create Game");
+        .WithSummary("Create Basket")
+        .WithDescription("Create Basket");
     }
 }
 

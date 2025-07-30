@@ -5,4 +5,5 @@ global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using Refit;
 global using AirWaterStore.Web.Models.AirWaterStore;
 global using AirWaterStore.Web.Services;
+global using AirWaterStore.Web.Models.Basket;
 

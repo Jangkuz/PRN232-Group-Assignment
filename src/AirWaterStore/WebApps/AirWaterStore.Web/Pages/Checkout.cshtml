@@ -30,7 +30,7 @@
                     @foreach (var item in Model.CartItems)
                     {
                         <tr>
-                            <td>@item.Title</td>
+                            <td>@item.GameTitle</td>
                             <td>@item.Price.ToString("C", Currency.VnCurrencyFormat)</td>
                             <td>@item.Quantity</td>
                             <td>@((item.Price * item.Quantity).ToString("C", Currency.VnCurrencyFormat))</td>

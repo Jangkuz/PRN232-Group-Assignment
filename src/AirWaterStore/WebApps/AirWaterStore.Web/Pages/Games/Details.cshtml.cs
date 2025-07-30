@@ -1,43 +1,42 @@
-﻿using AirWaterStore.Web.Models.Catalog;
-using AirWaterStore.Web.Services;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace AirWaterStore.Web.Pages.Games
+namespace AirWaterStore.Web.Pages.Games;
+
+public class DetailsModel(
+    ICatalogService catalogService,
+    IBasketService basketService,
+    ILogger<IndexModel> logger
+    ) : PageModel
 {
-    public class DetailsModel(
-        ICatalogService catalogService,
-        ILogger<IndexModel> logger
-        ) : PageModel
+
+    public Game Game { get; set; } = default!;
+    public List<Review> Reviews { get; set; } = [];
+    public Dictionary<int, string> UserNames { get; set; } = new Dictionary<int, string>();
+
+    [BindProperty]
+    public ReviewInputModel NewReview { get; set; } = default!;
+
+    public bool CanReview { get; set; }
+
+    public class ReviewInputModel
     {
+        public int GameId { get; set; }
 
-        public Game Game { get; set; } = default!;
-        public List<Review> Reviews { get; set; } = [];
-        public Dictionary<int, string> UserNames { get; set; } = new Dictionary<int, string>();
+        [Required]
+        [Range(1, 5)]
+        public int Rating { get; set; }
 
-        [BindProperty]
-        public ReviewInputModel NewReview { get; set; } = default!;
+        [Required]
+        [StringLength(1000)]
+        public string Comment { get; set; } = string.Empty;
+    }
 
-        public bool CanReview { get; set; }
+    public async Task<IActionResult> OnGetAsync(int id)
+    {
+        logger.LogInformation("Game detail visited");
 
-        public class ReviewInputModel
+        try
         {
-            public int GameId { get; set; }
-
-            [Required]
-            [Range(1, 5)]
-            public int Rating { get; set; }
-
-            [Required]
-            [StringLength(1000)]
-            public string Comment { get; set; } = string.Empty;
-        }
-
-        public async Task<IActionResult> OnGetAsync(int id)
-        {
-            logger.LogInformation("Game detail visited");
-
-            try
-            {
             var gameResult = await catalogService.GetGame(id);
             var game = gameResult.Game;
             if (game == null)
@@ -67,145 +66,155 @@ namespace AirWaterStore.Web.Pages.Games
             }
 
             return Page();
-            } catch(ApiException ex)
-            {
-
-            logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
-                return RedirectToPage(AppRouting.Home);
-            }
-
         }
-
-        //public async Task<IActionResult> OnPostAddToCartAsync(int gameId, int quantity = 1)
-        //{
-        //    if (!this.IsAuthenticated() || !this.IsCustomer())
-        //    {
-        //        return RedirectToPage("/Login");
-        //    }
-
-        //    var game = await _gameService.GetByIdAsync(gameId);
-        //    if (game == null || game.Quantity < quantity)
-        //    {
-        //        return RedirectToPage();
-        //    }
-
-        //    var cart = HttpContext.Session.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();
-
-        //    var existingItem = cart.FirstOrDefault(c => c.GameId == gameId);
-        //    if (existingItem != null)
-        //    {
-        //        existingItem.Quantity += quantity;
-        //    }
-        //    else
-        //    {
-        //        cart.Add(new CartItem
-        //        {
-        //            GameId = gameId,
-        //            Title = game.Title,
-        //            Price = game.Price,
-        //            Quantity = quantity
-        //        });
-        //    }
-
-        //    HttpContext.Session.SetObjectAsJson("Cart", cart);
-        //    TempData["SuccessMessage"] = "Game added to cart!";
-
-        //    return RedirectToPage();
-        //}
-
-        public async Task<IActionResult> OnPostAddReviewAsync()
+        catch (ApiException ex)
         {
-            if (!this.IsAuthenticated() || !this.IsCustomer())
-            {
-                return RedirectToPage(AppRouting.Login);
-            }
 
-            if (!ModelState.IsValid || !this.IsAuthenticated())
-            {
-                return await OnGetAsync(NewReview.GameId);
-            }
-
-            logger.LogInformation("Create review visited");
-
-            try
-            {
-                var reviewDto = new CreateReviewDto
-                (
-                    UserId: this.GetCurrentUserId(),
-                    UserName: this.GetCurrentUserName(),
-                    GameId: NewReview.GameId,
-                    Rating: NewReview.Rating,
-                    Comment: NewReview.Comment,
-                    ReviewDate: DateTime.UtcNow
-                );
-
-                await catalogService.PostReview(reviewDto);
-
-            }
-            catch (ApiException ex)
-            {
-
-                logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
-            }
-            return RedirectToPage(new { id = NewReview.GameId });
+            logger.LogWarning("Get games failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            return RedirectToPage(AppRouting.Home);
         }
 
-        public async Task<IActionResult> OnPostUpdateReviewAsync(int reviewId, int gameId, int rating, string comment)
+    }
+
+    public async Task<IActionResult> OnPostAddToCartAsync(int gameId, int quantity = 1)
+    {
+        if (!this.IsAuthenticated() || !this.IsCustomer())
         {
-            if (!this.IsAuthenticated() || !this.IsCustomer())
-            {
-                return RedirectToPage(AppRouting.Login);
-            }
-
-            logger.LogInformation("Update review visited");
-
-            try
-            {
-                var reviewDto = new UpdateReviewDto
-                (
-                    Id: reviewId,
-                    Rating: NewReview.Rating,
-                    Comment: NewReview.Comment
-                );
-
-                await catalogService.PutReview(reviewDto);
-
-            }
-            catch (ApiException ex)
-            {
-
-                logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
-            }
-
-            return RedirectToPage(new { id = gameId });
+            return RedirectToPage("/Login");
         }
 
-        public async Task<IActionResult> OnPostDeleteReviewAsync(int reviewId, int gameId)
+        try
         {
-            if (!this.IsAuthenticated() || !this.IsCustomer())
+            var gameResponse = await catalogService.GetGame(gameId);
+
+            if (gameResponse.Game.Quantity < quantity)
             {
-                return RedirectToPage(AppRouting.Login);
+                return RedirectToPage();
             }
 
-            logger.LogInformation("Delete review visited");
+            // Get or create cart in session
+            var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
 
-            try
+            var item = cart.Items.FirstOrDefault(i => i.GameId == gameId);
+
+            if(item == null)
             {
-
-                await catalogService.DeleteReview(reviewId);
-
+                cart.Items.Add(new CartItem
+                {
+                    GameId = gameResponse.Game.Id,
+                    GameTitle = gameResponse.Game.Title,
+                    Price = gameResponse.Game.Price,
+                    Quantity = quantity
+                });
             }
-            catch (ApiException ex)
+            else
             {
-
-                logger.LogWarning("Login failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+                item.Quantity+=quantity;
             }
-            return RedirectToPage(new { id = gameId});
+
+            await basketService.StoreBasket(new StoreBasketRequest(cart));
+            TempData["SuccessMessage"] = "Game added to cart!";
         }
-
-        public string GetUsername(int userId)
+        catch (ApiException ex)
         {
-            return UserNames.TryGetValue(userId, out var username) ? username : "Unknown User";
+            logger.LogWarning("Add to cart failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
         }
+
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostAddReviewAsync()
+    {
+        if (!this.IsAuthenticated() || !this.IsCustomer())
+        {
+            return RedirectToPage(AppRouting.Login);
+        }
+
+        if (!ModelState.IsValid || !this.IsAuthenticated())
+        {
+            return await OnGetAsync(NewReview.GameId);
+        }
+
+        logger.LogInformation("Create review visited");
+
+        try
+        {
+            var reviewDto = new CreateReviewDto
+            (
+                UserId: this.GetCurrentUserId(),
+                UserName: this.GetCurrentUserName(),
+                GameId: NewReview.GameId,
+                Rating: NewReview.Rating,
+                Comment: NewReview.Comment,
+                ReviewDate: DateTime.UtcNow
+            );
+
+            await catalogService.PostReview(reviewDto);
+
+        }
+        catch (ApiException ex)
+        {
+
+            logger.LogWarning("Add review failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+        }
+        return RedirectToPage(new { id = NewReview.GameId });
+    }
+
+    public async Task<IActionResult> OnPostUpdateReviewAsync(int reviewId, int gameId, int rating, string comment)
+    {
+        if (!this.IsAuthenticated() || !this.IsCustomer())
+        {
+            return RedirectToPage(AppRouting.Login);
+        }
+
+        logger.LogInformation("Update review visited");
+
+        try
+        {
+            var reviewDto = new UpdateReviewDto
+            (
+                Id: reviewId,
+                Rating: NewReview.Rating,
+                Comment: NewReview.Comment
+            );
+
+            await catalogService.PutReview(reviewDto);
+
+        }
+        catch (ApiException ex)
+        {
+
+            logger.LogWarning("Update review failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+        }
+
+        return RedirectToPage(new { id = gameId });
+    }
+
+    public async Task<IActionResult> OnPostDeleteReviewAsync(int reviewId, int gameId)
+    {
+        if (!this.IsAuthenticated() || !this.IsCustomer())
+        {
+            return RedirectToPage(AppRouting.Login);
+        }
+
+        logger.LogInformation("Delete review visited");
+
+        try
+        {
+
+            await catalogService.DeleteReview(reviewId);
+
+        }
+        catch (ApiException ex)
+        {
+
+            logger.LogWarning("Delete review failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+        }
+        return RedirectToPage(new { id = gameId });
+    }
+
+    public string GetUsername(int userId)
+    {
+        return UserNames.TryGetValue(userId, out var username) ? username : "Unknown User";
     }
 }

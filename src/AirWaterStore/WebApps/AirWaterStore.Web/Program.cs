@@ -32,6 +32,11 @@ namespace AirWaterStore.Web
                 {
                     c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
                 });
+            builder.Services.AddRefitClient<IBasketService>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
+                });
 
 
             builder.Services.AddAuthentication("Bearer")
