@@ -33,7 +33,7 @@ public class CreateOrderHandler(
 
         foreach (var orderItemDto in orderDto.OrderItems)
         {
-            var game = dbContext.Games.FirstOrDefault(g => g.Id.Value == orderItemDto.GameId);
+            var game = dbContext.Games.FirstOrDefault(g => g.Id == GameId.Of(orderItemDto.GameId));
 
             if (game == null)
             {

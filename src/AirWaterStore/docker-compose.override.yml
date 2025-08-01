@@ -49,6 +49,8 @@ services:
     restart: always
     ports:
       - "14333:1433"
+    volumes:
+      - postgres_order:/var/opt/mssql
 
   messagebroker:
     container_name: messagebroker
@@ -71,6 +73,7 @@ services:
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
     depends_on:
+      - ordering.api
       - catalogdb
       - messagebroker
     ports:
@@ -163,6 +166,7 @@ services:
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
     depends_on:
+      - ordering.api
       - airwaterstoredb
       - messagebroker
     ports:

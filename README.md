@@ -5,6 +5,10 @@
 - Update game haven't been sync via Rabbit MQ
 - After done `docker compose up -d` for the first time. Delete ordering's and airwaterstore's db due to race condition when seeding.
   - Then rerun air water store docker compose.
+- If faced with race condition when seeding database:
+  - Keep the table schema
+  - Delete the db record
+  - Rerun docker compose
 
 ##### *Test account*
 - User:

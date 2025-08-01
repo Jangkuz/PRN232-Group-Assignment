@@ -24,7 +24,7 @@ public class BasketCheckoutEventHandler (
         // Create full order with incoming event data
         var orderId = Guid.NewGuid();
 
-        var customer = dbContext.Customers.FirstOrDefault(c => c.Id.Value == message.CustomerId);
+        var customer = dbContext.Customers.FirstOrDefault(c => c.Id == CustomerId.Of(message.CustomerId));
         string customerName = customer is null ? "Unknown" : customer.Name;
         List<OrderItemDto> orderItems = [];
 
