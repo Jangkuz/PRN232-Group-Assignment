@@ -3,8 +3,11 @@ using Ordering.Application.Orders.Commands.CreateOrder;
 using MassTransit;
 
 namespace Ordering.Application.Orders.EventHandlers.Intergration;
-public class BasketCheckoutEventHandler
-    (ISender sender, ILogger<BasketCheckoutEventHandler> logger)
+public class BasketCheckoutEventHandler (
+    IApplicationDbContext dbContext,
+    ISender sender, 
+    ILogger<BasketCheckoutEventHandler> logger
+    )
     : IConsumer<BasketCheckoutEvent>
 {
     public async Task Consume(ConsumeContext<BasketCheckoutEvent> context)
@@ -19,21 +22,32 @@ public class BasketCheckoutEventHandler
     private CreateOrderCommand MapToCreateOrderCommand(BasketCheckoutEvent message)
     {
         // Create full order with incoming event data
-        //TODO: get order item from message
         var orderId = Guid.NewGuid();
+
+        var customer = dbContext.Customers.FirstOrDefault(c => c.Id.Value == message.CustomerId);
+        string customerName = customer is null ? "Unknown" : customer.Name;
+        List<OrderItemDto> orderItems = [];
+
+        foreach (var item in message.Items) {
+            orderItems.Add(
+                new OrderItemDto(
+                    orderId,
+                    item.GameId,
+                    item.Quantity,
+                    item.Price
+                    )
+                );
+        }
 
         var orderDto = new OrderDto(
             Id: orderId,
             CustomerId: message.CustomerId,
-            CustomerName: "",
-            OrderName: message.UserName,
+            CustomerName: customerName,
+            OrderName: $"ORD_{customerName}_{DateTime.UtcNow.Ticks}",
             //Payment: paymentDto,
             Status: Ordering.Domain.Enums.OrderStatus.Pending,
-            OrderItems:
-            [
-                new OrderItemDto(orderId,292030 , 2, 500),
-                new OrderItemDto(orderId, 1091500, 1, 400)
-            ]);
+            OrderItems: orderItems
+            );
 
         return new CreateOrderCommand(orderDto);
     }

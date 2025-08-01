@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Basket.API.Basket.CheckoutBasket;
 
-public record CheckoutBasketRequest(BasketCheckoutDto BasketCheckoutDto);
+public record CheckoutBasketRequest(int UserId);
 public record CheckoutBasketResponse(bool IsSuccess);
 
 public class CheckoutBasketEndpoints : ICarterModule

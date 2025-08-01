@@ -1,7 +1,5 @@
 ﻿using BuildingBlocks.Data;
-using BuildingBlocks.Messaging.Events;
 using MassTransit;
-using System.Text.Json;
 
 namespace Catalog.API.Data;
 

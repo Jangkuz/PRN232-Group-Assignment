@@ -15,8 +15,8 @@ public class DiscountContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Coupon>().HasData(
-            new Coupon { Id = 1, GameId = 413150, Description = "Stardew Valley discount", Amount = 150 },
-            new Coupon { Id = 2, GameId = 1245620, Description = "ELDEN RING discount", Amount = 100 }
+            new Coupon { Id = 1, GameId = 413150, Description = "Stardew Valley discount", Amount = 10 },
+            new Coupon { Id = 2, GameId = 1245620, Description = "ELDEN RING discount", Amount = 15 }
             );
     }
 }

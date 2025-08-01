@@ -11,14 +11,14 @@ internal class InitialData
             .Select(ConvertToCustomer)
             .ToList();
     }
-    public static async Task<IEnumerable<Game>> GamesAsync()
-    {
-        var rawList = await ReadGameData.ReadMockDataAsync();
+    //public static async Task<IEnumerable<Game>> GamesAsync()
+    //{
+    //    var rawList = await ReadGameData.ReadMockDataAsync();
 
-        return rawList
-            .Select(ConvertToGame)
-            .ToList();
-    }
+    //    return rawList
+    //        .Select(ConvertToGame)
+    //        .ToList();
+    //}
     public static IEnumerable<Order> OrdersWithItems
     {
         get
@@ -42,14 +42,15 @@ internal class InitialData
         }
     }
 
-    private static Game ConvertToGame(GameJsonDto dto)
-    {
-        return Game.Create(
-            id: GameId.Of(dto.AppId),
-            name: dto.Title,
-            price: ReadGameData.ParsePrice(dto.Price)
-            );
-    }
+    //private static Game ConvertToGame(GameJsonDto dto)
+    //{
+    //    return Game.Create(
+    //        id: GameId.Of(dto.AppId),
+    //        name: dto.Title,
+    //        price: ReadGameData.ParsePrice(dto.Price),
+    //        quantity: 
+    //        );
+    //}
     private static Customer ConvertToCustomer(UserJsonDto dto)
     {
         return Customer.Create(

@@ -7,7 +7,7 @@ services:
       - POSTGRES_DB=CatalogDb
     restart: always
     ports:
-        - "5432:5432"
+        - "5435:5432"
     volumes:
       - postgres_catalog:/var/lib/postgresql/data/ 
 
@@ -145,6 +145,7 @@ services:
       - catalog.api
       - basket.api
       - ordering.api
+      - airwaterstore.api
     ports:
       - "6004:8080"
       - "6064:8081"
@@ -158,8 +159,12 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__Database=Server=airwaterstoredb;Port=5432;Database=AirWaterStoreDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      - MessageBroker__Host=amqp://ecommerce-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
     depends_on:
       - airwaterstoredb
+      - messagebroker
     ports:
       - "6005:8080"
       - "6065:8081"

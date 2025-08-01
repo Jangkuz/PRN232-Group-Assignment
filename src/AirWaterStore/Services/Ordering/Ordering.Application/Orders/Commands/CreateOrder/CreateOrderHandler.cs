@@ -1,5 +1,10 @@
-﻿namespace Ordering.Application.Orders.Commands.CreateOrder;
-public class CreateOrderHandler(IApplicationDbContext dbContext)
+﻿using MassTransit;
+using Ordering.Application.Dtos;
+
+namespace Ordering.Application.Orders.Commands.CreateOrder;
+public class CreateOrderHandler(
+    IApplicationDbContext dbContext
+    )
     : ICommandHandler<CreateOrderCommand, CreateOrderResult>
 {
     public async Task<CreateOrderResult> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
@@ -28,7 +33,22 @@ public class CreateOrderHandler(IApplicationDbContext dbContext)
 
         foreach (var orderItemDto in orderDto.OrderItems)
         {
-            newOrder.Add(GameId.Of(orderItemDto.GameId), orderItemDto.Quantity, orderItemDto.Price);
+            var game = dbContext.Games.FirstOrDefault(g => g.Id.Value == orderItemDto.GameId);
+
+            if (game == null)
+            {
+                throw new GameNotFoundException(orderItemDto.GameId);
+            }
+
+            if (game.Quantity < orderItemDto.Quantity)
+            {
+                throw new BadRequestException("Not enough game in stock");
+            }
+
+            newOrder.Add(
+                GameId.Of(orderItemDto.GameId),
+                orderItemDto.Quantity,
+                orderItemDto.Price);
         }
         return newOrder;
     }

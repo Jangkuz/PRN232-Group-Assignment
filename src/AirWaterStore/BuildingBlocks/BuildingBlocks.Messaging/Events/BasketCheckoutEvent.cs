@@ -1,10 +1,17 @@
 ﻿namespace BuildingBlocks.Messaging.Events;
 public record BasketCheckoutEvent : IntegrationEvent
 {
-    public string UserName { get; set; } = default!;
     public int CustomerId { get; set; } = default!;
+    //public string CustomerName { get; set; } = default!;
     public decimal TotalPrice { get; set; } = default!;
 
     // Payment
-    public int PaymentMethod { get; set; } = default!;
+    public List<BasketItem> Items { get; set; } = [];
+    //public int PaymentMethod { get; set; } = default!;
 }
+
+public record BasketItem (
+    int GameId,
+    int Quantity,
+    decimal Price
+    );

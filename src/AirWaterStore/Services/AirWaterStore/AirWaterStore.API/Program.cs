@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BuildingBlocks.Messaging.MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,26 +58,28 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddMessageBroker(builder.Configuration);
+
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    await app.InitialiseDatabaseAsync();
-    using (var scope = app.Services.CreateScope())
-    {
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    //using (var scope = app.Services.CreateScope())
+    //{
+    //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-        string[] roleNames = { AppConst.Admin,
-        AppConst.Staff,
-        AppConst.User};
-        foreach (var role in roleNames)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-                await roleManager.CreateAsync(new Role(role));
-        }
-    }
+    //    string[] roleNames = { AppConst.Admin,
+    //    AppConst.Staff,
+    //    AppConst.User};
+    //    foreach (var role in roleNames)
+    //    {
+    //        if (!await roleManager.RoleExistsAsync(role))
+    //            await roleManager.CreateAsync(new Role(role));
+    //    }
+    //}
+    await app.InitialiseDatabaseAsync();
 }
 
 app.MapCarter();

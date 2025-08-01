@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Basket.API.Basket.CheckoutBasket;
 
-public record CheckoutBasketCommand(BasketCheckoutDto BasketCheckoutDto)
+public record CheckoutBasketCommand(int UserId)
     : ICommand<CheckoutBasketResult>;
 public record CheckoutBasketResult(bool IsSuccess);
 
@@ -13,8 +13,7 @@ public class CheckoutBasketCommandValidator
 {
     public CheckoutBasketCommandValidator()
     {
-        RuleFor(x => x.BasketCheckoutDto).NotNull().WithMessage("BasketCheckoutDto can't be null");
-        RuleFor(x => x.BasketCheckoutDto.UserName).NotEmpty().WithMessage("UserName is required");
+        RuleFor(x => x.UserId).NotEmpty().WithMessage("UserId is required");
     }
 }
 
@@ -29,19 +28,45 @@ public class CheckoutBasketCommandHandler
         // send basket checkout event to rabbitmq using masstransit
         // delete the basket
 
-        var basket = await repository.GetBasket(command.BasketCheckoutDto.CustomerId, cancellationToken);
+        var basket = await repository.GetBasket(command.UserId, cancellationToken);
         if (basket == null)
         {
             return new CheckoutBasketResult(false);
         }
 
-        var eventMessage = command.BasketCheckoutDto.Adapt<BasketCheckoutEvent>();
-        eventMessage.TotalPrice = basket.TotalPrice;
+        var eventMessage = basket.ToCheckoutEvent();
+        //eventMessage.TotalPrice = basket.TotalPrice;
 
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
-        await repository.DeleteBasket(command.BasketCheckoutDto.CustomerId, cancellationToken);
+        await repository.DeleteBasket(command.UserId, cancellationToken);
 
         return new CheckoutBasketResult(true);
+    }
+}
+
+internal static class ShoppingCartExtention
+{
+    public static BasketCheckoutEvent ToCheckoutEvent(this ShoppingCart cart)
+    {
+        List<BasketItem> basketItems = [];
+
+        foreach (var item in cart.Items)
+        {
+            basketItems.Add(
+                new BasketItem(
+                    GameId: item.GameId,
+                    Quantity: item.Quantity,
+                    Price: item.Price
+                    )
+                );
+        }
+
+        return new BasketCheckoutEvent
+        {
+            CustomerId = cart.UserId,
+            TotalPrice = cart.TotalPrice,
+            Items = basketItems
+        };
     }
 }

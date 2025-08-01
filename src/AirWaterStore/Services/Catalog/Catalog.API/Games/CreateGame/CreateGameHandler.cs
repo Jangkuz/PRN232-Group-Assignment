@@ -57,7 +57,8 @@ internal class CreateGameCommandHandler(
         {
             GameId = game.Id,
             Title = game.Title,
-            Price = game.Price
+            Price = game.Price,
+            Quantity = game.Quantity
         };
 
         await publishEndpoint.Publish(eventMessage, cancellationToken);

@@ -1,4 +1,7 @@
-﻿namespace AirWaterStore.API.Users.CreateUser;
+﻿using BuildingBlocks.Messaging.Events;
+using MassTransit;
+
+namespace AirWaterStore.API.Users.CreateUser;
 
 public record CreateUserCommand(
     string UserName,
@@ -11,7 +14,8 @@ public record CreateUserResult(int Id);
 //TODO: add validator
 
 internal class CreateUserHandler(
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    IPublishEndpoint publishEndpoint
     ) : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand command, CancellationToken cancellationToken)
@@ -35,6 +39,15 @@ internal class CreateUserHandler(
         await userManager.AddToRoleAsync(user, AppConst.User);
 
         //TODO: publish UserCreated Intergration Event
+        var integrationEvent = new UserCreatedEvent
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            Email = user.Email
+        };
+
+        await publishEndpoint.Publish(integrationEvent, cancellationToken);
+
         //TODO: Return login token for auto login
 
         return new CreateUserResult(user.Id);

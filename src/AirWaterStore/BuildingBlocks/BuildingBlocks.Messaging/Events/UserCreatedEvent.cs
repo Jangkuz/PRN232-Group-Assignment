@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BuildingBlocks.Messaging.Events;
-internal class UserCreatedEvent
+﻿namespace BuildingBlocks.Messaging.Events;
+public record UserCreatedEvent : IntegrationEvent
 {
+    public int UserId { get; set; }
+    public string UserName { get; set; } = default!;
+    public string Email { get; set; } = default!;
 }

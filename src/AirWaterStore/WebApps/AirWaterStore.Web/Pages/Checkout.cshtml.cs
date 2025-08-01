@@ -1,8 +1,13 @@
 using AirWaterStore.Web.Models.Basket;
+using System.Threading.Tasks;
 
 namespace AirWaterStore.Web.Pages;
 
-public class CheckoutModel : PageModel
+public class CheckoutModel (
+    ICatalogService catalogService,
+    IBasketService basketService,
+    ILogger<CheckoutModel> logger
+    ) : PageModel
 {
     //private readonly IOrderService _orderService;
     //private readonly IOrderDetailService _orderDetailService;
@@ -21,33 +26,35 @@ public class CheckoutModel : PageModel
     public decimal TotalPrice => CartItems.Sum(item => item.Price * item.Quantity);
     public string ErrorMessage { get; set; } = string.Empty;
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
-        //var userId = HttpContext.Session.GetInt32(SessionParams.UserId);
-        //if (!userId.HasValue)
-        //{
-        //    return RedirectToPage("/Login");
-        //}
+        if (this.IsAuthenticated())
+        {
+            return RedirectToPage("/Login");
+        }
 
-        //CartItems = HttpContext.Session.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();
+        var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
 
-        //if (!CartItems.Any())
-        //{
-        //    return RedirectToPage("/Cart");
-        //}
+        CartItems = cart.Items;
+
+        if (!CartItems.Any())
+        {
+            return RedirectToPage("/Cart");
+        }
 
         return Page();
     }
 
     //public async Task<IActionResult> OnPostAsync()
     //{
-    //    var userId = HttpContext.Session.GetInt32(SessionParams.UserId);
-    //    if (!userId.HasValue)
+    //    if (this.IsAuthenticated())
     //    {
     //        return RedirectToPage("/Login");
     //    }
 
-    //    CartItems = HttpContext.Session.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();
+    //    var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
+
+    //    CartItems = cart.Items;
 
     //    if (!CartItems.Any())
     //    {
