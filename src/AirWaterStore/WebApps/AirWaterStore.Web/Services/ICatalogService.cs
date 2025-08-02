@@ -18,6 +18,11 @@ public interface ICatalogService
     [Delete("/catalog-service/games/{gameId}")]
     Task<DeleteGameResponse> DeleteGame(int gameId);
 
+    [Get("/catalog-service/games/count")]
+    Task<GetGamesCountResponse> GetGamesCount();
+
+    //==========================================
+
     [Get("/catalog-service/reviews/{gameId}")]
     Task<GetReviewsByGameIdResponse> GetReviewsByGameId(int gameId);
 

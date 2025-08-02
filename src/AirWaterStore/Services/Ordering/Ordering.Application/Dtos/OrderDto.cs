@@ -5,4 +5,5 @@ public record OrderDto(
     string CustomerName,
     string OrderName,
     OrderStatus Status,
+    decimal TotalPrice,
     List<OrderItemDto> OrderItems);

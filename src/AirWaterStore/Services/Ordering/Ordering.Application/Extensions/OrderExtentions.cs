@@ -19,6 +19,7 @@ public static class OrderExtensions
                     CustomerName: order.Customer == null ? "N/A" : order.Customer.Name,
                     OrderName: order.OrderName.Value,
                     //Payment: new PaymentDto(order.Payment.CardName!, order.Payment.CardNumber, order.Payment.Expiration, order.Payment.CVV, order.Payment.PaymentMethod),
+                    TotalPrice: order.TotalPrice,
                     Status: order.Status,
                     OrderItems: order.OrderItems.Select(oi => new OrderItemDto(oi.OrderId.Value, oi.GameId.Value, oi.Quantity, oi.Price)).ToList()
                 );

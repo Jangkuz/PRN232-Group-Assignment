@@ -84,3 +84,5 @@ public record UpdateGameDto(
 public record UpdateGameResponse(bool IsSuccess);
 
 public record DeleteGameResponse(bool IsSuccess);
+
+public record GetGamesCountResponse(int Count);

@@ -1,3 +1,4 @@
+using AirWaterStore.Web.Extentions;
 using AirWaterStore.Web.Models.Ordering;
 
 namespace AirWaterStore.Web.Pages.Admin;
@@ -5,6 +6,7 @@ namespace AirWaterStore.Web.Pages.Admin;
 public class DashboardModel(
     ICatalogService catalogService,
     IAirWaterStoreService airWaterStoreService,
+    IOrderService orderService,
     ILogger<DashboardModel> logger
     ) : PageModel
 {
@@ -27,33 +29,36 @@ public class DashboardModel(
         try
         {
 
-        // Get statistics
-        //TotalGames = await _gameService.GetTotalCountAsync();
-        //TotalOrders = await _orderService.GetTotalCountAsync();
-        var userResult = await airWaterStoreService.GetUserCount();
+            // Get statistics
+            TotalGames = catalogService.GetGamesCount().GetAwaiter().GetResult().Count;
 
-        TotalUsers = userResult.UserCount;
+            var orderCountResult = await orderService.GetTotalCountAsync();
+            TotalOrders = orderCountResult.TotalOrder;
+            var userResult = await airWaterStoreService.GetUserCount();
 
-        //// Get pending chats (chats without assigned staff)
-        //// var userId = HttpContext.Session.GetInt32(SessionParams.UserId);
-        //var userId = this.GetCurrentUserId();
-        //var allChats = await _chatRoomService.GetChatRoomsByUserIdAsync(userId);
-        //PendingChats = allChats.Count(c => c.StaffId == null);
+            TotalUsers = userResult.UserCount;
 
-        //// Get recent orders
-        //RecentOrders = await _orderService.GetAllAsync(1, 5);
+            // Get pending chats (chats without assigned staff)
+            // var userId = HttpContext.Session.GetInt32(SessionParams.UserId);
+            var userId = this.GetCurrentUserId();
+            //var allChats = await _chatRoomService.GetChatRoomsByUserIdAsync(userId);
+            //PendingChats = allChats.Count(c => c.StaffId == null);
 
-        //// Load usernames for orders
-        //foreach (var order in RecentOrders)
-        //{
-        //    if (!UserNames.ContainsKey(order.UserId))
-        //    {
-        //        var user = await _userService.GetByIdAsync(order.UserId);
-        //        UserNames[order.UserId] = user?.Username ?? "Unknown User";
-        //    }
-        //}
+            // Get recent orders
+            var orderResult = await orderService.GetOrders(1, 5);
+            RecentOrders = orderResult.Orders.Data.Select(OrderExtention.ToOrder).ToList();
 
-        } catch (ApiException ex)
+            // Load usernames for orders
+            foreach (var order in RecentOrders)
+            {
+                if (!UserNames.ContainsKey(order.UserId))
+                {
+                    UserNames[order.UserId] = order.UserName ?? "Unknown User";
+                }
+            }
+
+        }
+        catch (ApiException ex)
         {
             logger.LogWarning("Dashboard load failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
         }

@@ -7,7 +7,7 @@ namespace Ordering.API.Endpoints;
 //- Retrieves and returns matching orders.
 
 //public record GetOrdersByIdRequest(string Id);
-public record GetOrdersByIdResponse(IEnumerable<OrderDto> Orders);
+public record GetOrdersByIdResponse(OrderDto Order);
 
 public class GetOrdersById : ICarterModule
 {

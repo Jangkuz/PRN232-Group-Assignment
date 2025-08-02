@@ -1,8 +1,6 @@
 ﻿
 namespace Catalog.API.Games.GetGames;
 
-//public record GetGamesRequest(
-//    );
 public record GetGamesResponse(IEnumerable<Game> Games);
 
 public class GetGamesEndpoint : ICarterModule

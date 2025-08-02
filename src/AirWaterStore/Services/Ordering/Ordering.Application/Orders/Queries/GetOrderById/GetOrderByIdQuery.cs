@@ -2,4 +2,4 @@
 public record GetOrderByIdQuery(string OrderId)
     : IQuery<GetOrdersByIdResult>;
 
-public record GetOrdersByIdResult(IEnumerable<OrderDto> Orders);
+public record GetOrdersByIdResult(OrderDto Order);

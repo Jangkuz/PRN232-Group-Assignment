@@ -6,15 +6,19 @@ public class GetOrdersByNameHandler(IApplicationDbContext dbContext)
     {
         // get orders by name using dbContext
         // return result
+        Guid.TryParse(query.OrderId, out var orderId);
 
-        var orders = await dbContext.Orders
+        var order = await dbContext.Orders
                 .Include(o => o.OrderItems)
                 .Include(o => o.Customer)
                 .AsNoTracking()
-                .Where(o => o.Id.Value.Equals(query.OrderId))
-                .OrderBy(o => o.Id.Value)
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(o => o.Id == OrderId.Of(orderId));
 
-        return new GetOrdersByIdResult(orders.ToOrderDtoList());
+        if (order is null)
+        {
+            throw new OrderNotFoundException(orderId);
+        }
+
+        return new GetOrdersByIdResult(order.ToOrderDto());
     }
 }

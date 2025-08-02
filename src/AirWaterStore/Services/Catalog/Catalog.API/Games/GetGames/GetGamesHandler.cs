@@ -1,10 +1,5 @@
 ﻿namespace Catalog.API.Games.GetGames;
 
-//public record GetGamesQuery(
-//    int? PageNumber = 1,
-//    int? PageSize = 10
-//    ) : IQuery<GetGamesResult>;
-
 public record GetGamesQuery(
     PaginationRequest PaginationRequest
     ) : IQuery<GetGamesResult>;

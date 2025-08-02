@@ -37,6 +37,12 @@ namespace AirWaterStore.Web
                 {
                     c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
                 });
+            builder.Services.AddRefitClient<IOrderService>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:GatewayAddress"]!);
+                });
+
 
 
             builder.Services.AddAuthentication("Bearer")

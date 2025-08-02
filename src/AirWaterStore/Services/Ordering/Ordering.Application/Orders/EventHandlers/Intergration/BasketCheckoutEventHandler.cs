@@ -45,6 +45,7 @@ public class BasketCheckoutEventHandler (
             CustomerName: customerName,
             OrderName: $"ORD_{customerName}_{DateTime.UtcNow.Ticks}",
             //Payment: paymentDto,
+            TotalPrice: message.TotalPrice,
             Status: Ordering.Domain.Enums.OrderStatus.Pending,
             OrderItems: orderItems
             );
