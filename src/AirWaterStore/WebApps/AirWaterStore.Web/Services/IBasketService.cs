@@ -10,11 +10,11 @@ public interface IBasketService
     [Post("/basket-service/basket")]
     Task<StoreBasketResponse> StoreBasket(StoreBasketRequest request);
 
+    [Post("/basket-service/basket/checkout")]
+    Task<CheckoutBasketResponse> CheckoutBasket(CheckoutBasketRequest request);
+
     [Delete("/basket-service/basket/{userId}")]
     Task<DeleteBasketResponse> DeleteBasket(int userId);
-
-    //[Post("/basket-service/basket/checkout")]
-    //Task<CheckoutBasketResponse> CheckoutBasket(CheckoutBasketRequest request);
 
     public async Task<ShoppingCart> LoadUserBasket(int userId)
     {

@@ -19,6 +19,11 @@ public class CartItem
 public record GetBasketResponse(ShoppingCart ShoppingCart);
 
 public record StoreBasketRequest(ShoppingCart ShoppingCart);
+
+public record CheckoutBasketRequest(int UserId);
+
+public record CheckoutBasketResponse(bool IsSuccess);
+
 public record StoreBasketResponse(int UserId);
 
 public record DeleteBasketResponse(bool IsSuccess);

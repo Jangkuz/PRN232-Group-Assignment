@@ -66,19 +66,6 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    //using (var scope = app.Services.CreateScope())
-    //{
-    //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-
-    //    string[] roleNames = { AppConst.Admin,
-    //    AppConst.Staff,
-    //    AppConst.User};
-    //    foreach (var role in roleNames)
-    //    {
-    //        if (!await roleManager.RoleExistsAsync(role))
-    //            await roleManager.CreateAsync(new Role(role));
-    //    }
-    //}
     await app.InitialiseDatabaseAsync();
 }
 

@@ -3,24 +3,12 @@ using System.Threading.Tasks;
 
 namespace AirWaterStore.Web.Pages;
 
-public class CheckoutModel (
+public class CheckoutModel(
     ICatalogService catalogService,
     IBasketService basketService,
     ILogger<CheckoutModel> logger
     ) : PageModel
 {
-    //private readonly IOrderService _orderService;
-    //private readonly IOrderDetailService _orderDetailService;
-    //private readonly IGameService _gameService;
-    //private readonly IVnPayService _paymentService;
-
-    //public CheckoutModel(IOrderService orderService, IOrderDetailService orderDetailService, IGameService gameService, IVnPayService paymentService)
-    //{
-    //    _orderService = orderService;
-    //    _orderDetailService = orderDetailService;
-    //    _gameService = gameService;
-    //    _paymentService = paymentService;
-    //}
 
     public List<CartItem> CartItems { get; set; } = new List<CartItem>();
     public decimal TotalPrice => CartItems.Sum(item => item.Price * item.Quantity);
@@ -45,82 +33,79 @@ public class CheckoutModel (
         return Page();
     }
 
-    //public async Task<IActionResult> OnPostAsync()
-    //{
-    //    if (this.IsAuthenticated())
-    //    {
-    //        return RedirectToPage("/Login");
-    //    }
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (this.IsAuthenticated())
+        {
+            return RedirectToPage("/Login");
+        }
 
-    //    var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
+        var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
 
-    //    CartItems = cart.Items;
+        CartItems = cart.Items;
 
-    //    if (!CartItems.Any())
-    //    {
-    //        return RedirectToPage("/Cart");
-    //    }
+        if (!CartItems.Any())
+        {
+            return RedirectToPage("/Cart");
+        }
 
-    //    try
-    //    {
-    //        // Validate stock availability
-    //        foreach (var item in CartItems)
-    //        {
-    //            var game = await _gameService.GetByIdAsync(item.GameId);
-    //            if (game == null || game.Quantity < item.Quantity)
-    //            {
-    //                ErrorMessage = $"'{item.Title}' is out of stock or insufficient quantity available.";
-    //                return Page();
-    //            }
-    //        }
+        try
+        {
+            // Validate stock availability
+            foreach (var item in CartItems)
+            {
+                var gameResult = await catalogService.GetGame(item.GameId);
+                var game = gameResult.Game;
+                if (game == null || game.Quantity < item.Quantity)
+                {
+                    ErrorMessage = $"'{item.GameTitle}' is out of stock or insufficient quantity available.";
+                    return Page();
+                }
+            }
 
-    //        // Create order
-    //        var order = new Order
-    //        {
-    //            UserId = userId.Value,
-    //            OrderDate = DateTime.Now,
-    //            TotalPrice = TotalPrice,
-    //            Status = OrderStatus.Pending
-    //        };
 
-    //        await _orderService.AddAsync(order);
+            var request = new CheckoutBasketRequest(UserId: this.GetCurrentUserId());
 
-    //        // Create order details and update stock
-    //        foreach (var item in CartItems)
-    //        {
-    //            var orderDetail = new OrderDetail
-    //            {
-    //                OrderId = order.OrderId,
-    //                GameId = item.GameId,
-    //                Quantity = item.Quantity,
-    //                Price = item.Price
-    //            };
+            var checkoutResponse = await basketService.CheckoutBasket(request);
 
-    //            await _orderDetailService.AddAsync(orderDetail);
 
-    //            // Update game stock
-    //            var game = await _gameService.GetByIdAsync(item.GameId);
-    //            if (game != null)
-    //            {
-    //                game.Quantity -= item.Quantity;
-    //                await _gameService.UpdateAsync(game);
-    //            }
-    //        }
+            // Create order details and update stock
+            //foreach (var item in CartItems)
+            //{
+            //    var orderDetail = new OrderDetail
+            //    {
+            //        OrderId = order.OrderId,
+            //        GameId = item.GameId,
+            //        Quantity = item.Quantity,
+            //        Price = item.Price
+            //    };
 
-    //        // Clear cart
-    //        HttpContext.Session.Remove("Cart");
+            //    await _orderDetailService.AddAsync(orderDetail);
 
-    //        // Redirect to order confirmation
-    //        //return RedirectToPage("/Orders/Details", new { id = order.OrderId });
+            //    // Update game stock
+            //    var game = await _gameService.GetByIdAsync(item.GameId);
+            //    if (game != null)
+            //    {
+            //        game.Quantity -= item.Quantity;
+            //        await _gameService.UpdateAsync(game);
+            //    }
+            //}
 
-    //        string paymentLink = _paymentService.CreatePayment(order);
+            // Clear cart
+            //HttpContext.Session.Remove("Cart");
 
-    //        return Redirect(paymentLink);
-    //    }
-    //    catch
-    //    {
-    //        ErrorMessage = "An error occurred while processing your order. Please try again.";
-    //        return Page();
-    //    }
-    //}
+            // Redirect to order confirmation
+            return RedirectToPage(AppRouting.Order);
+
+            //string paymentLink = _paymentService.CreatePayment(order);
+
+            //return Redirect(paymentLink);
+        }
+        catch (ApiException ex)
+        {
+            logger.LogWarning("Checkout failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            ErrorMessage = "An error occurred while processing your order. Please try again.";
+            return Page();
+        }
+    }
 }
