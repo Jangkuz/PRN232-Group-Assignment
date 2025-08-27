@@ -1,20 +1,22 @@
 # PRN232-Group-Assignment
 
-This is a personal project to learn microservices and use new technologies
+This is a **personal project/proof of concetp** to learn microservices and use new technologies
 
 Goals:
 
 - Develop a ecommerse web with multiple microservices backends
 - Use multiple Db both SQL and NoSQL
 - Microservices communicate via RabbitMQ messages
+- Add monitoring and scalling using grafana/otel-lgtm stack
 
 ## _Note_
 
 Cons (tobe fixed in the future?):
 
-- Business rule is tight(for learning purposes)
-- Basket's quantity validation is FE based
-  - Customer have to re-try checking order's stock validation manually
+- Business rule is not tight(for learning purposes)
+  - If game's price is updated, the game(s) price in cart will not updated
+  - Basket's quantity validation is FE based
+  - Don't have menu for adding discount, only API
 - Update game haven't been sync via Rabbit MQ
 - The project don't have a source of truth. Thus race condition and data lose. Have not found a solution
   - After done `docker compose up -d` for the first time. Delete ordering's and airwaterstore's db due to race condition when seeding.
@@ -24,6 +26,10 @@ Cons (tobe fixed in the future?):
     - Delete the db record
     - Rerun docker compose
 
+## TODOs
+
+- [ ]
+
 ## _Test account_
 
 - User:
@@ -32,21 +38,3 @@ Cons (tobe fixed in the future?):
 - Staff:
   - Email: <staff@gmail.com>
   - Password: 123456As!
-
-```mermaid
-sequenceDiagram
-actor User
-User ->> OrderingService: PlaceOrder()
-OrderingService ->> OrderingService: Create Order
-OrderingService ->> EventBus: Publish OrderCreatedIntegrationEvent
-EventBus ->> PaymentService: Consume OrderCreatedIntegrationEvent
-EventBus ->> ShippingService: Consume OrderCreatedIntegrationEvent
-```
-
-```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
-```
