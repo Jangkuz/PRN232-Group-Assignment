@@ -1,9 +1,9 @@
-using AirWaterStore.Web.Models.Ordering;
-using Microsoft.Extensions.Options;
-
 namespace AirWaterStore.Web.Pages.Orders;
 
-public class DetailsModel : PageModel
+public class DetailsModel(
+    IOrderService orderService,
+    ILogger<DetailsModel> logger
+    ) : PageModel
 {
     //private readonly IOrderService _orderService;
     //private readonly IOrderDetailService _orderDetailService;
@@ -11,100 +11,47 @@ public class DetailsModel : PageModel
     //private readonly IVnPayService _paymentService;
     //private readonly VnPayConfig _vpnPayConfig;
 
-    //public DetailsModel(IOrderService orderService, IOrderDetailService orderDetailService, IUserService userService, IVnPayService vpnPayService, IOptions<VnPayConfig> vnpayConfig)
-    //{
-    //    _orderService = orderService;
-    //    _orderDetailService = orderDetailService;
-    //    _userService = userService;
-    //    _paymentService = vpnPayService;
-    //    _vpnPayConfig = vnpayConfig.Value;
-    //}
-
-    [BindProperty(SupportsGet = true)]
-    public string Vnp_TxnRef { get; set; }
-    [BindProperty(SupportsGet = true)]
-    public string Vnp_TransactionStatus { get; set; }
-    [BindProperty(SupportsGet = true)]
-    public string Vnp_ResponseCode { get; set; }
-    [BindProperty(SupportsGet = true)]
-    public string Vnp_SecureHash { get; set; }
+    //[BindProperty(SupportsGet = true)]
+    //public string Vnp_TxnRef { get; set; }
+    //[BindProperty(SupportsGet = true)]
+    //public string Vnp_TransactionStatus { get; set; }
+    //[BindProperty(SupportsGet = true)]
+    //public string Vnp_ResponseCode { get; set; }
+    //[BindProperty(SupportsGet = true)]
+    //public string Vnp_SecureHash { get; set; }
 
     public Order Order { get; set; } = default!;
     public List<OrderDetail> OrderDetails { get; set; } = new();
     public string CustomerName { get; set; } = string.Empty;
 
-    // public bool IsStaff => HttpContext.Session.GetInt32(SessionParams.UserRole) == UserRole.Staff;
-    // public int? CurrentUserId => HttpContext.Session.GetInt32(SessionParams.UserId);
-
-    public async Task<IActionResult> OnGetAsync(int? id)
+    public async Task<IActionResult> OnGetAsync(string id)
     {
-//        if (!this.IsAuthenticated())
-//        {
-//            return RedirectToPage("/Login");
-//        }
+        //if (!this.IsAuthenticated())
+        //{
+        //    return RedirectToPage("/Login");
+        //}
 
-//        Order? order = null;
+        //Order? order = null;
 
-//        if (!string.IsNullOrEmpty(Vnp_TxnRef))
-//        {
-//            order = await _orderService.GetByIdAsync(VnPayHelper.ExtractOrderId(Vnp_TxnRef));
+        //order = await orderService.GetOrderById(id);
 
-//            var vnpay = new VnPayLibrary();
+        //if (order == null)
+        //{
+        //    return NotFound();
+        //}
 
-//            foreach (var (key, value) in Request.Query)
-//            {
-//#pragma warning disable CS8604 // Possible null reference argument.
-//                if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
-//                {
-//                    vnpay.AddResponseData(key, value);
-//                }
-//#pragma warning restore CS8604 // Possible null reference argument.
-//            }
+        //Order = order;
 
-//            var checkSigniture = vnpay.ValidateSignature(Vnp_SecureHash, _vpnPayConfig.HashSecret);
+        //// Check authorization - customers can only see their own orders
+        //if (!this.IsStaff() && Order.UserId != this.GetCurrentUserId())
+        //{
+        //    return Forbid();
+        //}
 
-//            if (checkSigniture)
-//            {
-//                if (Vnp_ResponseCode.Equals("00") && Vnp_TransactionStatus.Equals("00"))
-//                {
-//                    Console.WriteLine("Giao dich thanh cong");
-//                    if (order != null && !order.Status.Equals(OrderStatus.Completed))
-//                    {
-//                        order.Status = OrderStatus.Completed;
-//                        await _orderService.UpdateAsync(order);
-//                    }
-//                }
-//                else
-//                {
-//                    Console.WriteLine("Giao dich that bai");
-//                }
-//            }
-//        }
-//        else
-//        {
-//            if (id != null)
-//            {
-//                order = await _orderService.GetByIdAsync((int)id);
-//            }
-//        }
+        //OrderDetails = await _orderDetailService.GetAllByOrderIdAsync(Order.OrderId);
 
-//        if (order == null)
-//        {
-//            return NotFound();
-//        }
-
-//        Order = order;
-
-//        // Check authorization - customers can only see their own orders
-//        if (!this.IsStaff() && Order.UserId != this.GetCurrentUserId())
-//        {
-//            return Forbid();
-//        }
-
-//        OrderDetails = await _orderDetailService.GetAllByOrderIdAsync(Order.OrderId);
-
-//        var customer = await _userService.GetByIdAsync(Order.UserId);
-//        CustomerName = customer?.Username ?? "Unknown Customer";
+        //var customer = await _userService.GetByIdAsync(Order.UserId);
+        //CustomerName = customer?.Username ?? "Unknown Customer";
 
         return Page();
     }

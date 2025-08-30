@@ -1,5 +1,3 @@
-using AirWaterStore.Web.Models.Catalog;
-
 namespace AirWaterStore.Web.Pages.Admin.Games;
 
 public class DeleteModel(
@@ -23,7 +21,7 @@ ILogger<DeleteModel> logger
         try
         {
             logger.LogInformation("Delete game visited");
-            
+
             var game = await catalogService.GetGame(id);
 
             Game = game.Game;

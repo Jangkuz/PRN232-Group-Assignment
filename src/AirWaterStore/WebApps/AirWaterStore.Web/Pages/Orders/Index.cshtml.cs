@@ -1,8 +1,6 @@
-using AirWaterStore.Web.Models.Ordering;
-
 namespace AirWaterStore.Web.Pages.Orders;
 
-public class IndexModel (
+public class IndexModel(
     IOrderService orderService,
     ILogger<IndexModel> logger
     ) : PageModel
@@ -21,27 +19,36 @@ public class IndexModel (
             return RedirectToPage(AppRouting.Login);
         }
 
-        CurrentPage = currentPage;
-
-        if (this.IsStaff()) // Staff sees all orders
+        try
         {
-            var ordersResult = await orderService.GetOrders(currentPage, PageSize);
 
-            Orders = ordersResult.Orders.Data.Select(o => o.ToOrder()).ToList();
+            CurrentPage = currentPage;
 
-            var totalCount = orderService.GetTotalCountAsync().GetAwaiter().GetResult().TotalOrder;
-            TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+            if (this.IsStaff()) // Staff sees all orders
+            {
+                var ordersResult = await orderService.GetOrders(currentPage, PageSize);
+
+                Orders = ordersResult.Orders.Data.Select(o => o.ToOrder()).ToList();
+
+                var totalCount = orderService.GetTotalCountAsync().GetAwaiter().GetResult().TotalOrder;
+                TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+            }
+            else // Customer sees only their orders
+            {
+                var ordersResult = await orderService.GetOrdersByCustomerId(this.GetCurrentUserId());
+
+                Orders = ordersResult.Orders.Select(o => o.ToOrder()).ToList();
+
+                var totalCount = 10;
+                TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+            }
+
+            return Page();
         }
-        else // Customer sees only their orders
+        catch (ApiException ex)
         {
-            var ordersResult = await orderService.GetOrdersByCustomerId(this.GetCurrentUserId());
-
-            Orders = ordersResult.Orders.Select(o => o.ToOrder()).ToList();
-
-            var totalCount = 10;
-            TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+            logger.LogWarning("Get orders failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            return RedirectToPage(AppRouting.Home);
         }
-
-        return Page();
     }
 }

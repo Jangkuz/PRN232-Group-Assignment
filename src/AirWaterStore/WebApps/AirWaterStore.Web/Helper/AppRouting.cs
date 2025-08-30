@@ -8,4 +8,6 @@ public static class AppRouting
     public static string Order = "/Orders";
     public static string GameDetail = "/Games/Details";
     public static string AdminDashboard = "/Admin/Dashboard";
+
+    public static string Error = "/Error";
 }

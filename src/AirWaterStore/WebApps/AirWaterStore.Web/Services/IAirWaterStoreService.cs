@@ -1,6 +1,4 @@
-﻿using AirWaterStore.Web.Models.AirWaterStore;
-
-namespace AirWaterStore.Web.Services;
+﻿namespace AirWaterStore.Web.Services;
 
 public interface IAirWaterStoreService
 {

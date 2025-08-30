@@ -97,7 +97,7 @@ public class DetailsModel(
 
             var item = cart.Items.FirstOrDefault(i => i.GameId == gameId);
 
-            if(item == null)
+            if (item == null)
             {
                 cart.Items.Add(new CartItem
                 {
@@ -109,7 +109,7 @@ public class DetailsModel(
             }
             else
             {
-                item.Quantity+=quantity;
+                item.Quantity += quantity;
             }
 
             await basketService.StoreBasket(new StoreBasketRequest(cart));

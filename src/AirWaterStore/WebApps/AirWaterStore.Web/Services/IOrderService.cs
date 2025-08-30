@@ -1,6 +1,4 @@
-﻿using AirWaterStore.Web.Models.Ordering;
-
-namespace AirWaterStore.Web.Services;
+﻿namespace AirWaterStore.Web.Services;
 
 public interface IOrderService
 {

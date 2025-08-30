@@ -1,6 +1,3 @@
-using AirWaterStore.Web.Extentions;
-using AirWaterStore.Web.Models.Ordering;
-
 namespace AirWaterStore.Web.Pages.Admin;
 
 public class DashboardModel(

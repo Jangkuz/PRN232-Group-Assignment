@@ -31,31 +31,41 @@ public class IndexModel(
 
         logger.LogInformation("Game list visited");
 
-        var result = await catalogService.GetGames(1, 1000); // Get all for filtering
-
-        var allGames = result.Games;
-
-        //// Filter by search string
-        if (!string.IsNullOrEmpty(SearchString))
+        try
         {
-            allGames = allGames.Where(g =>
-                g.Title.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
-                (g.GenresString?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (g.Developer?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false)
-            ).ToList();
+            var result = await catalogService.GetGames(1, 1000); // Get all for filtering
+
+            var allGames = result.Games;
+
+            //// Filter by search string
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                allGames = allGames.Where(g =>
+                    g.Title.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ||
+                    (g.GenresString?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (g.Developer?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) ?? false)
+                ).ToList();
+            }
+
+            //// Calculate pagination
+            var totalCount = allGames.Count();
+            TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+
+            // Get paginated results
+            Games = allGames
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            return Page();
+
         }
+        catch (Exception ex)
+        {
+            logger.LogWarning("Get games failed: {Content}", ex.Message);
+            return RedirectToPage(AppRouting.Error);
 
-        //// Calculate pagination
-        var totalCount = allGames.Count();
-        TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
-
-        // Get paginated results
-        Games = allGames
-            .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize)
-            .ToList();
-
-        return Page();
+        }
     }
 
     public async Task<IActionResult> OnPostAddToCartAsync(int gameId)

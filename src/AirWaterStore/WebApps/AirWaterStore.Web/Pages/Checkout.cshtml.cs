@@ -1,6 +1,3 @@
-using AirWaterStore.Web.Models.Basket;
-using System.Threading.Tasks;
-
 namespace AirWaterStore.Web.Pages;
 
 public class CheckoutModel(

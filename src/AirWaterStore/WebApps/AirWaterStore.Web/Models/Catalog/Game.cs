@@ -1,5 +1,4 @@
-﻿using AirWaterStore.Web.Models.Ordering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AirWaterStore.Web.Models.Catalog;
 
@@ -16,8 +15,9 @@ public partial class Game
     public List<string> Genres { get; set; } = [];
 
     [Display(Name = "Genres (comma-separated)")]
-    public string GenresString { 
-        get 
+    public string GenresString
+    {
+        get
         {
             var result = "N/A.";
             if (Genres != null && Genres.Any())

@@ -1,6 +1,4 @@
-﻿using AirWaterStore.Web.Models.AirWaterStore;
-
-namespace AirWaterStore.Web.Models.Ordering;
+﻿namespace AirWaterStore.Web.Models.Ordering;
 
 public partial class Order
 {

@@ -1,4 +1,16 @@
 services:
+  airwaterstoredb:
+    container_name: airwaterstoredb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=AirWaterStoreDb
+    restart: always
+    ports:
+      - "7071:5432"
+    volumes:
+      - postgres_airwaterstore:/var/lib/postgresql/data/ 
+  
   catalogdb:
     container_name: catalogdb
     environment:
@@ -7,7 +19,7 @@ services:
       - POSTGRES_DB=CatalogDb
     restart: always
     ports:
-        - "5435:5432"
+        - "7072:5432"
     volumes:
       - postgres_catalog:/var/lib/postgresql/data/ 
 
@@ -19,27 +31,9 @@ services:
       - POSTGRES_DB=BasketDb
     restart: always
     ports:
-        - "5433:5432"
+        - "7073:5432"
     volumes:
       - postgres_basket:/var/lib/postgresql/data/ 
-
-  airwaterstoredb:
-    container_name: airwaterstoredb
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=AirWaterStoreDb
-    restart: always
-    ports:
-        - "5434:5432"
-    volumes:
-      - postgres_airwaterstore:/var/lib/postgresql/data/ 
-
-  distributedcache:
-    container_name: distributedcache
-    restart: always
-    ports:
-      - "6379:6379"
 
   orderdb:
     container_name: orderdb
@@ -48,9 +42,15 @@ services:
       - SA_PASSWORD=123456Sa
     restart: always
     ports:
-      - "14333:1433"
+      - "7075:1433"
     volumes:
       - postgres_order:/var/opt/mssql
+
+  distributedcache:
+    container_name: distributedcache
+    restart: always
+    ports:
+      - "6379:6379"
 
   messagebroker:
     container_name: messagebroker
@@ -63,7 +63,47 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  yarpapigateway:
+    container_name: yarpapigateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+    depends_on:
+      - catalog.api
+      - basket.api
+      - ordering.api
+      - airwaterstore.api
+    ports:
+      - "6000:8080"
+      - "6060:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  airwaterstore.api:
+    container_name: airwaterstore.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__Database=Server=airwaterstoredb;Port=5432;Database=AirWaterStoreDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      - MessageBroker__Host=amqp://ecommerce-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
+    depends_on:
+      - ordering.api
+      - airwaterstoredb
+      - messagebroker
+    ports:
+      - "6001:8080"
+      - "6061:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
   catalog.api:
+    container_name: catalog.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -77,13 +117,14 @@ services:
       - catalogdb
       - messagebroker
     ports:
-      - "6000:8080"
-      - "6060:8081"
+      - "6002:8080"
+      - "6062:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
   basket.api:
+    container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -100,26 +141,28 @@ services:
       - discount.grpc
       - messagebroker
     ports:
-      - "6001:8080"
-      - "6061:8081"
+      - "6003:8080"
+      - "6063:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
   discount.grpc:
+    container_name: discount.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__Database=Data Source=discountdb
     ports:
-      - "6002:8080"
-      - "6062:8081"
+      - "6004:8080"
+      - "6064:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
   ordering.api:
+    container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -131,43 +174,6 @@ services:
       - FeatureManagement__OrderFullfilment=false
     depends_on:
       - orderdb
-      - messagebroker
-    ports:
-      - "6003:8080"
-      - "6063:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-
-  yarpapigateway:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-    depends_on:
-      - catalog.api
-      - basket.api
-      - ordering.api
-      - airwaterstore.api
-    ports:
-      - "6004:8080"
-      - "6064:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-
-  airwaterstore.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=airwaterstoredb;Port=5432;Database=AirWaterStoreDb;User Id=postgres;Password=postgres;Include Error Detail=true
-      - MessageBroker__Host=amqp://ecommerce-mq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
-    depends_on:
-      - ordering.api
-      - airwaterstoredb
       - messagebroker
     ports:
       - "6005:8080"
