@@ -13,9 +13,9 @@ public class CheckoutModel(
 
     public async Task<IActionResult> OnGet()
     {
-        if (this.IsAuthenticated())
+        if (!this.IsAuthenticated())
         {
-            return RedirectToPage("/Login");
+            return RedirectToPage(AppRouting.Login);
         }
 
         var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
@@ -24,7 +24,7 @@ public class CheckoutModel(
 
         if (!CartItems.Any())
         {
-            return RedirectToPage("/Cart");
+            return RedirectToPage(AppRouting.Cart);
         }
 
         return Page();
@@ -32,9 +32,9 @@ public class CheckoutModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (this.IsAuthenticated())
+        if (!this.IsAuthenticated())
         {
-            return RedirectToPage("/Login");
+            return RedirectToPage(AppRouting.Login);
         }
 
         var cart = await basketService.LoadUserBasket(this.GetCurrentUserId());
@@ -43,7 +43,7 @@ public class CheckoutModel(
 
         if (!CartItems.Any())
         {
-            return RedirectToPage("/Cart");
+            return RedirectToPage(AppRouting.Cart);
         }
 
         try

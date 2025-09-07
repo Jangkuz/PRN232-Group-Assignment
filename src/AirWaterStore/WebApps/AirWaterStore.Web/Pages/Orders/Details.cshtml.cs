@@ -2,6 +2,7 @@ namespace AirWaterStore.Web.Pages.Orders;
 
 public class DetailsModel(
     IOrderService orderService,
+    IAirWaterStoreService airWaterStoreService,
     ILogger<DetailsModel> logger
     ) : PageModel
 {
@@ -21,39 +22,43 @@ public class DetailsModel(
     //public string Vnp_SecureHash { get; set; }
 
     public Order Order { get; set; } = default!;
-    public List<OrderDetail> OrderDetails { get; set; } = new();
+    public List<OrderItem> OrderDetails { get; set; } = new();
     public string CustomerName { get; set; } = string.Empty;
 
     public async Task<IActionResult> OnGetAsync(string id)
     {
-        //if (!this.IsAuthenticated())
-        //{
-        //    return RedirectToPage("/Login");
-        //}
+        if (!this.IsAuthenticated())
+        {
+            return RedirectToPage("/Login");
+        }
 
-        //Order? order = null;
+        try
+        {
 
-        //order = await orderService.GetOrderById(id);
+            var orderResult = await orderService.GetOrderById(id);
 
-        //if (order == null)
-        //{
-        //    return NotFound();
-        //}
+            Order = orderResult.Order.ToOrder();
 
-        //Order = order;
+            // Check authorization - customers can only see their own orders
+            if (!this.IsStaff() && Order.UserId != this.GetCurrentUserId())
+            {
+                return Forbid();
+            }
 
-        //// Check authorization - customers can only see their own orders
-        //if (!this.IsStaff() && Order.UserId != this.GetCurrentUserId())
-        //{
-        //    return Forbid();
-        //}
+            OrderDetails = Order.OrderItems.ToList();
+            var customer = await airWaterStoreService.GetUserById(Order.UserId);
+            CustomerName = customer.User.UserName;
 
-        //OrderDetails = await _orderDetailService.GetAllByOrderIdAsync(Order.OrderId);
+            return Page();
 
-        //var customer = await _userService.GetByIdAsync(Order.UserId);
-        //CustomerName = customer?.Username ?? "Unknown Customer";
 
-        return Page();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogWarning("Get order failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            return RedirectToPage(AppRouting.Home);
+
+        }
     }
 
     //public async Task<IActionResult> OnPostUpdateStatusAsync(int orderId, string status)

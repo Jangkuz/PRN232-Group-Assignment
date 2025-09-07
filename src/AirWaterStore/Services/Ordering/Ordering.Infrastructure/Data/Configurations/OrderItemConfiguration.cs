@@ -11,9 +11,10 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
                                    orderItemId => orderItemId.Value,
                                    dbId => OrderItemId.Of(dbId));
 
-        builder.HasOne<Game>()
+        builder.HasOne(oi => oi.Game)
             .WithMany()
-            .HasForeignKey(oi => oi.GameId);
+            .HasForeignKey(oi => oi.GameId)
+            .IsRequired();
 
         builder.Property(oi => oi.Quantity).IsRequired();
 

@@ -1,9 +1,9 @@
 ﻿namespace BuildingBlocks.Messaging.Events;
 public record OrderCreatedEvent : IntegrationEvent
 {
-    public int CustomerId;
-    public string OrderName = default!;
-    public List<OrderItem> OrderItem = default!;
+    public int CustomerId { get; set; }
+    public string OrderName { get; set; } = default!;
+    public List<OrderItem> OrderItems { get; set; } = default!;
 }
 
 

@@ -96,6 +96,8 @@ FE ->> Basket.API: BasketCheckout()
 Basket.API ->> RabbitMQ: Publish BasketCheckoutEvent
 RabbitMQ ->> Ordering.API: Consume BasketCheckoutEvent
 Ordering.API ->> Ordering.API: CreateOrder()
+Ordering.API ->> Ordering.API: Publish OrderCreatedDomainEvent
+Ordering.API ->> Ordering.API: Consume OrderCreatedDomainEvent
 Ordering.API ->> RabbitMQ: Publish OrderCreatedEvent
 else Insufficient quanitity
 FE ->> User: Insufficient quantity response

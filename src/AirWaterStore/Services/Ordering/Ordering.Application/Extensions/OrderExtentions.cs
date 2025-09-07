@@ -16,12 +16,18 @@ public static class OrderExtensions
         return new OrderDto(
                     Id: order.Id.Value,
                     CustomerId: order.CustomerId.Value,
-                    CustomerName: order.Customer == null ? "N/A" : order.Customer.Name,
+                    CustomerName: order.Customer?.Name ?? "N/A",
                     OrderName: order.OrderName.Value,
                     //Payment: new PaymentDto(order.Payment.CardName!, order.Payment.CardNumber, order.Payment.Expiration, order.Payment.CVV, order.Payment.PaymentMethod),
                     TotalPrice: order.TotalPrice,
                     Status: order.Status,
-                    OrderItems: order.OrderItems.Select(oi => new OrderItemDto(oi.OrderId.Value, oi.GameId.Value, oi.Quantity, oi.Price)).ToList()
+                    OrderItems: order.OrderItems.Select(oi => new OrderItemDto(
+                        oi.OrderId.Value, 
+                        oi.GameId.Value, 
+                        oi.Game.Title,
+                        oi.Quantity, 
+                        oi.Price
+                        )).ToList()
                 );
     }
 }

@@ -29,7 +29,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.InitializeMartenWith<CatalogInitialData>();
 }
 
-builder.Services.AddMessageBroker(builder.Configuration);
+builder.Services.AddMessageBroker(builder.Configuration, assembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 

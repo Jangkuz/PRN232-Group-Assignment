@@ -24,9 +24,9 @@ public class OrderCreatedEventHandler(
 
     private async Task<List<UpdateGameCommand>> MapToUpdateGameCommand(OrderCreatedEvent message)
     {
-        var gameList = await session.LoadManyAsync<Game>(message.OrderItem.Select(i => i.GameId).ToList());
-        var orderItemDictionary = message.OrderItem.ToDictionary(o => o.GameId, o => o.Quantity);
-        
+        var gameList = await session.LoadManyAsync<Game>(message.OrderItems.Select(i => i.GameId).ToList());
+        var orderItemDictionary = message.OrderItems.ToDictionary(o => o.GameId, o => o.Quantity);
+
         List<UpdateGameCommand> result = [];
 
         foreach (var game in gameList)

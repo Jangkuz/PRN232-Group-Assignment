@@ -1,5 +1,4 @@
-﻿using Basket.API.Dtos;
-using MediatR;
+﻿using MediatR;
 
 namespace Basket.API.Basket.CheckoutBasket;
 

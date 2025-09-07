@@ -24,15 +24,19 @@ public class BasketCheckoutEventHandler (
         // Create full order with incoming event data
         var orderId = Guid.NewGuid();
 
-        var customer = dbContext.Customers.FirstOrDefault(c => c.Id == CustomerId.Of(message.CustomerId));
-        string customerName = customer is null ? "Unknown" : customer.Name;
+        //var customer = dbContext.Customers.FirstOrDefault(c => c.Id == CustomerId.Of(message.CustomerId));
+        //string customerName = customer is null ? "Unknown" : customer.Name;
+        string customerName = dbContext.Customers.FirstOrDefault(c => c.Id == CustomerId.Of(message.CustomerId))?.Name ?? "Unknown Customer";
+
         List<OrderItemDto> orderItems = [];
 
         foreach (var item in message.Items) {
+            string gameTitle = dbContext.Games.FirstOrDefault(c => c.Id == GameId.Of(item.GameId))?.Title ?? "Unknown Game";
             orderItems.Add(
                 new OrderItemDto(
                     orderId,
                     item.GameId,
+                    gameTitle,
                     item.Quantity,
                     item.Price
                     )
@@ -46,7 +50,7 @@ public class BasketCheckoutEventHandler (
             OrderName: $"ORD_{customerName}_{DateTime.UtcNow.Ticks}",
             //Payment: paymentDto,
             TotalPrice: message.TotalPrice,
-            Status: Ordering.Domain.Enums.OrderStatus.Pending,
+            Status: OrderStatus.Pending,
             OrderItems: orderItems
             );
 

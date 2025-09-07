@@ -25,9 +25,9 @@
                 @foreach (var order in Model.Orders)
                 {
                     <tr>
-                        <td>@order.OrderId</td>
+                        <td>@order.OrderName</td>
                         <td>@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
-                        <td>@order.OrderDetails.Count items</td>
+                        <td>@order.OrderItems.Count items</td>
                         <td>@order.TotalPrice.ToString("C", Currency.VnCurrencyFormat)</td>
                         <td>
                             <span class="badge badge-@(order.Status == "Completed" ? "success" : "warning") text-dark">

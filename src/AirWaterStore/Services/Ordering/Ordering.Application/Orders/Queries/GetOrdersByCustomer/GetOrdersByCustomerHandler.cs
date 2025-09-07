@@ -9,6 +9,7 @@ public class GetOrdersByCustomerHandler(IApplicationDbContext dbContext)
 
         var orders = await dbContext.Orders
                         .Include(o => o.OrderItems)
+                            .ThenInclude(oi => oi.Game)
                         .Include(o => o.Customer)
                         .AsNoTracking()
                         .Where(o => o.CustomerId == CustomerId.Of(query.CustomerId))

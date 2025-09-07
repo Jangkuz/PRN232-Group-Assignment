@@ -10,6 +10,7 @@ public class GetOrdersByNameHandler(IApplicationDbContext dbContext)
 
         var order = await dbContext.Orders
                 .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Game)
                 .Include(o => o.Customer)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == OrderId.Of(orderId));

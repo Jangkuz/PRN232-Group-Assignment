@@ -14,4 +14,9 @@ public interface IOrderService
     [Get("/ordering-service/orders/count")]
     Task<GetOrdersCountResponse> GetTotalCountAsync();
 
+    //================================
+
+
+    [Get("/ordering-service/orders/{orderId}")]
+    Task<GetOrderByIdResponse> GetOrderDetailById(string orderId);
 }

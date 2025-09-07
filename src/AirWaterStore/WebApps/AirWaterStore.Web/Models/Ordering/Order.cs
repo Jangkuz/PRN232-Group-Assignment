@@ -4,6 +4,8 @@ public partial class Order
 {
     public string OrderId { get; set; } = string.Empty;
 
+    public string OrderName { get; set; } = string.Empty;
+
     public int UserId { get; set; }
 
     public string UserName { get; set; } = string.Empty;
@@ -14,7 +16,7 @@ public partial class Order
 
     public string Status { get; set; } = null!;
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
 }
 
@@ -37,8 +39,9 @@ public record OrderDto(
     int CustomerId,
     string CustomerName,
     string OrderName,
+    int Status,
     decimal TotalPrice,
-    int status
+    IEnumerable<OrderItemDto> OrderItems
     );
 
 public record GetOrdersCountResponse(

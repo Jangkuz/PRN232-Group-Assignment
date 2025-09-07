@@ -1,8 +1,11 @@
-﻿using MassTransit;
+﻿using BuildingBlocks.Messaging.Events;
+using MassTransit;
 using Ordering.Application.Dtos;
+using OrderItem = BuildingBlocks.Messaging.Events.OrderItem;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder;
 public class CreateOrderHandler(
+    IPublishEndpoint publishEndpoint,
     IApplicationDbContext dbContext
     )
     : ICommandHandler<CreateOrderCommand, CreateOrderResult>

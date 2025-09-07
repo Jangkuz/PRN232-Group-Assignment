@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BuildingBlocks.Messaging.Events;
-internal class OrderPayEvent
+﻿namespace BuildingBlocks.Messaging.Events;
+public record OrderPayEvent : IntegrationEvent
 {
+    //public int CustomerId;
+    //public string OrderName = default!;
 }

@@ -15,4 +15,6 @@ public class OrderItem : Entity<OrderItemId>
     public GameId GameId { get; private set; } = default!;
     public int Quantity { get; private set; } = default!;
     public decimal Price { get; private set; } = default!;
+
+    public Game Game { get; private set; } = default!;
 }
