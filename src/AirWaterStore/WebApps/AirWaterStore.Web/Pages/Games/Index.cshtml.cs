@@ -1,6 +1,4 @@
-﻿
-
-namespace AirWaterStore.Web.Pages.Games;
+﻿namespace AirWaterStore.Web.Pages.Games;
 
 public class IndexModel(
     ICatalogService catalogService,

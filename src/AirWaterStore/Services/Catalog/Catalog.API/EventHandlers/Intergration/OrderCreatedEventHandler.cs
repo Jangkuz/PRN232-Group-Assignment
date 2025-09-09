@@ -32,6 +32,7 @@ public class OrderCreatedEventHandler(
         foreach (var game in gameList)
         {
             var command = new UpdateGameCommand(
+
                 Id: game.Id,
                 ThumbnailUrl: game.ThumbnailUrl!,
                 Title: game.Title,
@@ -39,7 +40,7 @@ public class OrderCreatedEventHandler(
                 Genre: game.Genres,
                 Developer: game.Developer!,
                 Publisher: game.Publisher!,
-                ReleaseDate: (DateOnly)game.ReleaseDate!,
+                ReleaseDate: game.ReleaseDate ?? DateOnly.MinValue,
                 Price: game.Price,
                 Quantity: game.Quantity - orderItemDictionary[game.Id]
                 );

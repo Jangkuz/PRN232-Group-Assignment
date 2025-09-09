@@ -6,3 +6,9 @@ public static class OrderStatus
     public const string Completed = "Completed";
 
 }
+
+public enum OrderDtoStatus
+{
+    Pending = 1,
+    Completed = 2
+}

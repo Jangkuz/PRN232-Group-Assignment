@@ -1,4 +1,5 @@
 ﻿@page "{id?}"
+@using AirWaterStore.Web.Extentions
 @using AirWaterStore.Web.Helper;
 @model AirWaterStore.Web.Pages.Orders.DetailsModel
 @{
@@ -13,8 +14,8 @@
             <dt class="col-sm-4">Order Number:</dt>
             <dd class="col-sm-8">#@Model.Order.OrderId</dd>
 
-            <dt class="col-sm-4">Order Date:</dt>
-            <dd class="col-sm-8">@Model.Order.OrderDate.ToString("MMMM dd, yyyy HH:mm")</dd>
+            @* <dt class="col-sm-4">Order Date:</dt>
+            <dd class="col-sm-8">@Model.Order.OrderDate.ToString("MMMM dd, yyyy HH:mm")</dd> *@
 
             <dt class="col-sm-4">Customer:</dt>
             <dd class="col-sm-8">@Model.CustomerName</dd>
@@ -71,9 +72,11 @@
     <a asp-page="/Orders/Index" class="btn btn-secondary">Back to Orders</a>
     @if (Model.IsStaff() && Model.Order.Status == OrderStatus.Pending)
     {
-        <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+        @* <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
             <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
-            <input type="hidden" name="status" value="Completed" />
+            <input type="hidden" name="status" value="Completed" /> *@
+        <form method="post" asp-page-handler="CheckOut" class="d-inline">
+            <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
             <button type="submit" class="btn btn-success ml-2">Mark as Completed</button>
         </form>
     }

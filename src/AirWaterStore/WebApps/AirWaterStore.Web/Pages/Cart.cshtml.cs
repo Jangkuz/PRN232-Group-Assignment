@@ -1,4 +1,3 @@
-
 namespace AirWaterStore.Web.Pages;
 
 public class CartModel(

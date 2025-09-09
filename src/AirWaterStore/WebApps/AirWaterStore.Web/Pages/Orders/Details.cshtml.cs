@@ -78,22 +78,42 @@ public class DetailsModel(
     //    return RedirectToPage(new { id = orderId });
     //}
 
-    //public async Task<IActionResult> OnPostCheckOutAsync(int orderId)
-    //{
-    //    if (this.IsStaff())
-    //    {
-    //        return Unauthorized();
-    //    }
+    public async Task<IActionResult> OnPostCheckOutAsync(string orderId)
+    {
+        if (this.IsStaff())
+        {
+            return Unauthorized();
+        }
 
-    //    var order = await _orderService.GetByIdAsync(orderId);
-    //    if (order == null)
-    //    {
-    //        return NotFound();
-    //    }
+        try
+        {
+            var order = orderService.GetOrderById(orderId).GetAwaiter().GetResult().Order.ToOrder();
+            var orderDto = new OrderDto(
+                Id: order.OrderId,
+                CustomerId: order.UserId,
+                CustomerName: order.UserName,
+                OrderName: order.OrderName,
+                TotalPrice: order.TotalPrice,
+                Status: (int)OrderDtoStatus.Completed,
+                OrderItems: []
+                );
+            var updateRequest = new UpdateOrderStatusRequest(orderDto);
+            var response = await orderService.UpdateOrderStatus(updateRequest);
 
-    //    string paymentLink = _paymentService.CreatePayment(order);
+            // Implement 3rd party payment
 
-    //    return Redirect(paymentLink);
-    //}
+            return RedirectToPage(new {id = orderId});
+        }
+        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            logger.LogWarning("Order not found: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            return NotFound();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogWarning("Update order status failed: {StatusCode}, {Content}", ex.StatusCode, ex.Content);
+            return RedirectToPage(AppRouting.Home);
+        }
+    }
 
 }

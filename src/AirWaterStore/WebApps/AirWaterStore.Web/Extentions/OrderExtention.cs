@@ -14,7 +14,7 @@ public static class OrderExtention
             UserId = orderDto.CustomerId,
             UserName = orderDto.CustomerName,
             TotalPrice = orderDto.TotalPrice,
-            Status = orderDto.Status.ToString(),
+            Status = Enum.GetName(typeof(OrderDtoStatus), orderDto.Status) ?? "Unknown",
             OrderItems = items
         };
     }
@@ -30,4 +30,5 @@ public static class OrderExtention
             Quantity = itemDto.Quantity,
         };
     }
+
 }

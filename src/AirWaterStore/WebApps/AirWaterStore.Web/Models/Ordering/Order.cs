@@ -14,7 +14,7 @@ public partial class Order
 
     public decimal TotalPrice { get; set; }
 
-    public string Status { get; set; } = null!;
+    public string Status { get; set; } = string.Empty;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
@@ -22,6 +22,11 @@ public partial class Order
 
 public record GetOrderByIdResponse(OrderDto Order);
 public record GetOrdersByCustomerIdResponse(IEnumerable<OrderDto> Orders);
+public record UpdateOrderStatusResponse(
+    bool IsSuccess
+    );
+
+public record UpdateOrderStatusRequest(OrderDto Order);
 
 public record GetOrdersResponse(
     OrderPaging Orders

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace AirWaterStore.Web.Helper;
+namespace AirWaterStore.Web.Extentions;
 
 public static class PageModelExtentions
 {
