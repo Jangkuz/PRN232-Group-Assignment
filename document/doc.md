@@ -49,12 +49,44 @@ sequenceDiagram
 actor User
 User ->> AirWaterStore.API: CreateUser()
 AirWaterStore.API ->> RabbitMQ: Publish UserCreatedEvent
-RabbitMQ ->> Catalog.API: Consume UserCreatedEvent
-Catalog.API ->> Catalog.API: AddCustomer()
-RabbitMQ ->> Chat.API: Consume UserCreatedEvent
-Chat.API ->> Chat.API: AddUser()
+RabbitMQ ->>+ Catalog.API: Consume UserCreatedEvent
+Catalog.API ->>- Catalog.API: AddCustomer()
+RabbitMQ ->>+ Chat.API: Consume UserCreatedEvent
+Chat.API ->>- Chat.API: AddUser()
 RabbitMQ ->> Ordering.API: Consume UserCreatedEvent
 Ordering.API ->> Ordering.API: AddCustomer()
+```
+
+```mermaid
+sequenceDiagram
+    %% autonumber
+
+    actor User
+    participant AWS as AirWaterStore.API
+    participant MQ as RabbitMQ
+
+    box Aqua Downstream Services
+    participant C as Catalog.API
+    participant CH as Chat.API
+    participant O as Ordering.API
+    end
+
+    User ->>+ AWS: CreateUser()
+    AWS ->> MQ: Publish UserCreatedEvent
+    deactivate AWS
+
+    Note over MQ: RabbitMQ distributes the UserCreatedEvent
+
+    par Catalog Service
+        MQ ->>+ C: Consume UserCreatedEvent
+        C ->>- C: AddCustomer()
+    and Chat Service
+        MQ ->>+ CH: Consume UserCreatedEvent
+        CH ->>- CH: AddUser()
+    and Ordering Service
+        MQ ->>+ O: Consume UserCreatedEvent
+        O ->>- O: AddCustomer()
+    end
 ```
 
 #### 2. GameCreated
