@@ -1,11 +1,12 @@
 from fastapi import FastAPI, WebSocket, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import engine, SessionLocal
-from . import schemas, models, websocket_handlers, rabbitmq
+from . import shemas, models, websocket_handlers, rabbitmq
 from .chat_service import ChatRoomService
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+
 
 def get_db():
     db = SessionLocal()
@@ -14,37 +15,42 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/chatrooms/{user_id}", response_model=list[schemas.ChatRoomOut])
+
+@app.get("/chatrooms/{user_id}", response_model=list[shemas.ChatRoomOut])
 def list_chatrooms(user_id: int, db: Session = Depends(get_db)):
     svc = ChatRoomService(db)
     rooms = svc.get_chatrooms_by_user(user_id)
-    return [schemas.ChatRoomOut(
-        chat_room_id=r.chat_room_id,
-        customer_id=r.customer_id,
-        staff_id=r.staff_id
-    ) for r in rooms]
+    return [
+        shemas.ChatRoomOut(
+            chat_room_id=r.chat_room_id, customer_id=r.customer_id, staff_id=r.staff_id
+        )
+        for r in rooms
+    ]
 
-@app.get("/chatrooms/details/{chat_room_id}", response_model=schemas.ChatRoomOut)
+
+@app.get("/chatrooms/details/{chat_room_id}", response_model=shemas.ChatRoomOut)
 def get_chatroom_details(chat_room_id: int, db: Session = Depends(get_db)):
     svc = ChatRoomService(db)
     chatroom = svc.get_chatroom_by_id(chat_room_id)
     if not chatroom:
         raise HTTPException(status_code=404, detail="Chatroom not found")
-    return schemas.ChatRoomOut(
+    return shemas.ChatRoomOut(
         chat_room_id=chatroom.chat_room_id,
         customer_id=chatroom.customer_id,
-        staff_id=chatroom.staff_id
+        staff_id=chatroom.staff_id,
     )
 
-@app.post("/chatrooms/{customer_id}", response_model=schemas.ChatRoomOut)
+
+@app.post("/chatrooms/{customer_id}", response_model=shemas.ChatRoomOut)
 def create_or_get_chatroom(customer_id: int, db: Session = Depends(get_db)):
     svc = ChatRoomService(db)
     chatroom = svc.get_or_create_chatroom(customer_id)
-    return schemas.ChatRoomOut(
+    return shemas.ChatRoomOut(
         chat_room_id=chatroom.chat_room_id,
         customer_id=chatroom.customer_id,
-        staff_id=chatroom.staff_id
+        staff_id=chatroom.staff_id,
     )
+
 
 @app.post("/chatrooms/{chat_room_id}/assign")
 def assign_staff(chat_room_id: int, staff_id: int, db: Session = Depends(get_db)):
@@ -52,43 +58,47 @@ def assign_staff(chat_room_id: int, staff_id: int, db: Session = Depends(get_db)
     svc.assign_staff_to_chatroom(chat_room_id, staff_id)
     return {"status": "assigned"}
 
-@app.get("/messages/{chat_room_id}", response_model=list[schemas.MessageOut])
+
+@app.get("/messages/{chat_room_id}", response_model=list[shemas.MessageOut])
 def get_messages(chat_room_id: int, db: Session = Depends(get_db)):
     msgs = db.query(models.Message).filter_by(chat_room_id=chat_room_id).all()
     return [
-        schemas.MessageOut(
+        shemas.MessageOut(
             message_id=m.message_id,
             chat_room_id=m.chat_room_id,
             user_id=m.user_id,
             content=m.content,
             sent_at=m.sent_at,
-            username=m.user.username
-        ) for m in msgs
+            username=m.user.username,
+        )
+        for m in msgs
     ]
 
-@app.post("/messages", response_model=schemas.MessageOut)
-def add_message(msg: schemas.MessageCreate, db: Session = Depends(get_db)):
-    chatroom = db.query(models.ChatRoom).filter_by(chat_room_id=msg.chat_room_id).first()
+
+@app.post("/messages", response_model=shemas.MessageOut)
+def add_message(msg: shemas.MessageCreate, db: Session = Depends(get_db)):
+    chatroom = (
+        db.query(models.ChatRoom).filter_by(chat_room_id=msg.chat_room_id).first()
+    )
     if not chatroom:
         raise HTTPException(status_code=404, detail="Chatroom not found")
 
     message = models.Message(
-        chat_room_id=msg.chat_room_id,
-        user_id=msg.user_id,
-        content=msg.content.strip()
+        chat_room_id=msg.chat_room_id, user_id=msg.user_id, content=msg.content.strip()
     )
     db.add(message)
     db.commit()
     db.refresh(message)
 
-    return schemas.MessageOut(
+    return shemas.MessageOut(
         message_id=message.message_id,
         chat_room_id=message.chat_room_id,
         user_id=message.user_id,
         content=message.content,
         sent_at=message.sent_at,
-        username=message.user.username
+        username=message.user.username,
     )
+
 
 @app.websocket("/ws/{chatroom_id}")
 async def websocket_endpoint(websocket: WebSocket, chatroom_id: int):
