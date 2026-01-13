@@ -1,19 +1,21 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .database import engine, SessionLocal
+from app.core.database import mongodb_startup, mongodb_shutdown
 from . import shemas, models, websocket_handlers, rabbitmq
 from .chat_service import ChatRoomService
 
-models.Base.metadata.create_all(bind=engine)
-app = FastAPI()
+# models.Base.metadata.create_all(bind=engine)
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await mongodb_startup()
+    yield
+    await mongodb_shutdown()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/chatrooms/{user_id}", response_model=list[shemas.ChatRoomOut])

@@ -1,9 +1,10 @@
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from typing import List, Optional
 
+from pymongo import AsyncMongoClient
+
 class ChatRoomService:
-    def __init__(self, db):
+    def __init__(self, db: AsyncMongoClient):
         self.db = db
         self.collection = self.db["chat_rooms"]
 

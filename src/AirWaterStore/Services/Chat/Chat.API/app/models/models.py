@@ -1,7 +1,7 @@
 from typing import Optional, Annotated
 from datetime import datetime, timezone
 from beanie import Document, Indexed
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 
 class User(Document):
@@ -13,7 +13,7 @@ class User(Document):
         name = "users"
 
 
-class ChatRoom(Document):
+class ChatRoom(BaseModel):
     chat_room_id: Annotated[int,Indexed(unique=True)]
     customer_id: Annotated[int,Indexed()]
     staff_id: Optional[Annotated[int,Indexed()]] = None

@@ -28,7 +28,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app\chat_service.py" />
+    <Compile Include="app\dependencies.py" />
+    <Compile Include="app\services\chat_service.py" />
     <Compile Include="app\core\config.py" />
     <Compile Include="app\core\database.py" />
     <Compile Include="app\main.py" />
@@ -39,8 +40,6 @@
     <Compile Include="app\websocket_handlers.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="app\models\__init__.py" />
-    <Compile Include="app\repository\message_repo.py" />
-    <Compile Include="app\repository\__init__.py" />
     <Compile Include="app\routes\__init__.py" />
     <Compile Include="app\services\__init__.py" />
   </ItemGroup>
@@ -53,7 +52,6 @@
     <Folder Include="app\models\" />
     <Folder Include="app\services\" />
     <Folder Include="app\routes\" />
-    <Folder Include="app\repository\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
