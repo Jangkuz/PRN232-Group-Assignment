@@ -28,6 +28,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\models\chatroom.py" />
+    <Compile Include="app\models\message.py" />
+    <Compile Include="app\models\user.py" />
     <Compile Include="app\dependencies.py" />
     <Compile Include="app\services\chat_service.py" />
     <Compile Include="app\core\config.py" />

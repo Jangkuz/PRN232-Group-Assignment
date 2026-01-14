@@ -1,8 +1,7 @@
-import asyncio
+from app.core.config import settings
 from typing import Optional
 from beanie import Document, Indexed, init_beanie
 from pymongo import AsyncMongoClient
-from app.core.config import settings
 from fastapi import FastAPI
 from loguru import logger
 
@@ -18,7 +17,7 @@ class Database:
 db_manager = Database()
 
 
-def mongodb_startup(app: FastAPI) -> None:
+async def mongodb_startup(app: FastAPI) -> None:
     """
     Establishes a connection to the MongoDB database on application startup.
 
@@ -33,10 +32,11 @@ def mongodb_startup(app: FastAPI) -> None:
     logger.info("Connecting to MongoDB...")
     mongo_client = AsyncMongoClient(settings.MONGODB_URL)
     db_manager.client = mongo_client
+    await init_db(mongo_client)
     logger.info("Connected to MongoDB!")
 
 
-def mongodb_shutdown(app: FastAPI) -> None:
+async def mongodb_shutdown(app: FastAPI) -> None:
     """
     Closes the MongoDB connection on application shutdown.
 
@@ -49,3 +49,13 @@ def mongodb_shutdown(app: FastAPI) -> None:
     logger.info("Closing MongoDB connection...")
     db_manager.client.close()
     logger.info("MongoDb connection closed!")
+
+
+async def init_db(client: AsyncMongoClient):
+    db = client[settings.DATABASE_NAME]
+
+    collection = db[settings.CHATROOM_COLLECTION_NAME]
+
+    await collection.create_index("chat_room_id", unique=True)
+    await collection.create_index("customer_id")
+    await collection.create_index("staff_id")

@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     # If MONGODB_URL isn't in .env, it defaults to the string below
     MONGODB_URL: str = Field(default="mongodb://localhost:27017")
     DATABASE_NAME: str = "ChatDb"
+    CHATROOM_COLLECTION_NAME: str = "ChatRooms"
+    MESSAGES_COLLECTION_NAME: str = "Messages"
 
     # Security
     SECRET_KEY: str = "development-secret-key"

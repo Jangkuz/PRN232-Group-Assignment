@@ -1,7 +1,7 @@
 from fastapi import Depends
 from app.core.database import db_manager
 from app.core.config import settings
-from app.services.chat_service import ChatRoomService
+from app.services.chatroom_service import ChatRoomService
 
 
 def get_db():
