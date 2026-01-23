@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 from datetime import datetime, timezone
-from app.core.types import PyObjectId
+from beanie import Document, Indexed
 
-class Message(BaseModel):
-    message_id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+class Message(Document):
     chat_room_id: str
     user_id: int
     content: str
@@ -11,3 +11,7 @@ class Message(BaseModel):
 
     class Settings:
         name = "messages"
+        indexes = [
+            ["chat_room_id", "sent_at"],
+            "sent_at",
+        ]

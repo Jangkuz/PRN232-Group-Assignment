@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, WebSocket, Depends, HTTPException
+from fastapi import FastAPI
 from sqlalchemy.orm import Session
-from app.core.database import mongodb_startup, mongodb_shutdown
+from app.core.database import mongodb_startup
 from app.routes import routes
 
 # models.Base.metadata.create_all(bind=engine)
@@ -11,7 +11,6 @@ from app.routes import routes
 async def lifespan(app: FastAPI):
     await mongodb_startup(app)
     yield
-    await mongodb_shutdown(app)
 
 
 app = FastAPI(lifespan=lifespan)

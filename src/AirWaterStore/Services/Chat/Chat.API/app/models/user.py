@@ -1,11 +1,10 @@
-from pydantic import BaseModel, Field
-from app.core.types import PyObjectId
+from beanie import Document, Indexed
+from typing import Annotated
 
 
-class User(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    user_id: int = Field(unique=True)
-    username: str = Field(unique=True)
+class User(Document):
+    user_id: Annotated[int, Indexed(unique=True)]
+    username: str
     role: int
 
     class Settings:

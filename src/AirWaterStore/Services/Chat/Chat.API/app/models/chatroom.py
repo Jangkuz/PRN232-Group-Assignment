@@ -1,10 +1,15 @@
-from pydantic import BaseModel, Field
-from app.core.types import PyObjectId
+from beanie import Document
+from typing import Optional
 
-class ChatRoom(BaseModel):
-    chat_room_id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+class ChatRoom(Document):
+    # chat_room_id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     customer_id: int
-    staff_id: int | None = Field(default=None)
+    staff_id: Optional[int] = None
 
     class Settings:
         name = "chatrooms"
+        indexes = [
+            "customer_id",
+            "staff_id",
+        ]
